@@ -15,3 +15,18 @@ decision:
     summary: Sommaire
     unpublished: Inédit
     missing: "Décision %id% introuvable dans Judilibre."
+filters:
+    title: Filtres
+    jurisdictions: Juridictions
+    chambers: Chambres
+    locations: Sièges
+    publications: Publication
+    all_publications: "Aucune coche : toutes les décisions, inédits compris."
+    period: Période
+    dateStart: Du
+    dateEnd: Au
+    taxonomy_unavailable: Liste indisponible (Judilibre ne répond pas).
+dossier:
+    title: Dossier
+    empty: "Épinglez des décisions depuis leurs cartes 📌, ou demandez-le à l'assistant."
+    unpin: Retirer du dossier

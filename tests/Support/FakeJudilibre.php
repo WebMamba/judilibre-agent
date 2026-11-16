@@ -26,6 +26,8 @@ final class FakeJudilibre
     {
         $this->respond('search', self::fixture('search.json'));
         $this->respond('decision', self::fixture('decision.json'));
+        $this->respond('taxonomy:chamber', self::json('{"id":"chamber","result":{"soc":"Chambre sociale","civ1":"Première chambre civile","comm":"Chambre commerciale"}}'));
+        $this->respond('taxonomy:location', self::json('{"id":"location","result":{"ca_lyon":"Cour d\'appel de Lyon","ca_paris":"Cour d\'appel de Paris"}}'));
     }
 
     public static function fixture(string $name): MockResponse
@@ -45,14 +47,19 @@ final class FakeJudilibre
         return $this;
     }
 
-    /** The mock response factory: answers by the last segment of the path. */
+    /**
+     * The mock response factory: answers by the last segment of the path, and for a
+     * taxonomy by its id first (`taxonomy:chamber`).
+     */
     public function __invoke(string $method, string $url): MockResponse
     {
         $this->requests[] = $url;
         $endpoint = basename((string) parse_url($url, \PHP_URL_PATH));
+        parse_str((string) parse_url($url, \PHP_URL_QUERY), $query);
+        $response = $this->responses[$endpoint.':'.($query['id'] ?? '')] ?? $this->responses[$endpoint] ?? self::json('{"message":"Not found"}', 404);
 
         // A MockResponse is consumed once: hand out a copy.
-        return clone ($this->responses[$endpoint] ?? self::json('{"message":"Not found"}', 404));
+        return clone $response;
     }
 
     public function client(): JudilibreClient

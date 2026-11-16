@@ -80,7 +80,7 @@ final class StateToolsTest extends TestCase
 
     public function testListTaxonomy(): void
     {
-        $judilibre = new FakeJudilibre()->respond('taxonomy', FakeJudilibre::json('{"id":"chamber","result":{"soc":"Chambre sociale","civ1":"Première chambre civile"}}'));
+        $judilibre = new FakeJudilibre()->respond('taxonomy:chamber', FakeJudilibre::json('{"id":"chamber","result":{"soc":"Chambre sociale","civ1":"Première chambre civile"}}'));
 
         $result = new ListTaxonomy($judilibre->client())('chamber', 'cc');
 

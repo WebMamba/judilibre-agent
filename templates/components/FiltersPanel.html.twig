@@ -1,0 +1,72 @@
+{# The filters every search obeys. The agent changes them with set_filters too. #}
+<section {{ attributes.defaults({class: 'panel'}) }}>
+    <h2 class="panel-title">{{ 'filters.title'|trans }}</h2>
+
+    <fieldset class="mt-2">
+        <legend class="panel-label">{{ 'filters.jurisdictions'|trans }}</legend>
+        {% for key, label in this.options('jurisdictions') %}
+            {{ _self.checkbox('jurisdictions', key, label, this.selected('jurisdictions', key)) }}
+        {% endfor %}
+    </fieldset>
+
+    {% if this.searchesIn('cc') %}
+        {% set chambers = this.options('chambers') %}
+        <fieldset class="mt-3">
+            <legend class="panel-label">{{ 'filters.chambers'|trans }}</legend>
+            {% for key, label in chambers %}
+                {{ _self.checkbox('chambers', key, label, this.selected('chambers', key)) }}
+            {% else %}
+                <p class="text-xs text-slate-500 dark:text-slate-400">{{ 'filters.taxonomy_unavailable'|trans }}</p>
+            {% endfor %}
+        </fieldset>
+    {% endif %}
+
+    {% if this.searchesIn('ca') %}
+        <fieldset class="mt-3">
+            <legend class="panel-label">{{ 'filters.locations'|trans }}</legend>
+            <div class="max-h-40 overflow-y-auto pr-1">
+                {% for key, label in this.options('locations') %}
+                    {{ _self.checkbox('locations', key, label, this.selected('locations', key)) }}
+                {% else %}
+                    <p class="text-xs text-slate-500 dark:text-slate-400">{{ 'filters.taxonomy_unavailable'|trans }}</p>
+                {% endfor %}
+            </div>
+        </fieldset>
+    {% endif %}
+
+    <fieldset class="mt-3">
+        <legend class="panel-label">{{ 'filters.publications'|trans }}</legend>
+        {% for key, label in this.options('publications') %}
+            {{ _self.checkbox('publications', key, label, this.selected('publications', key)) }}
+        {% endfor %}
+        {% if filters.publications is empty %}
+            <p class="text-[11px] text-slate-500 dark:text-slate-400">{{ 'filters.all_publications'|trans }}</p>
+        {% endif %}
+    </fieldset>
+
+    <fieldset class="mt-3">
+        <legend class="panel-label">{{ 'filters.period'|trans }}</legend>
+        <div class="grid grid-cols-2 gap-2">
+            {% for field in ['dateStart', 'dateEnd'] %}
+                <label class="text-[11px] text-slate-500 dark:text-slate-400">
+                    {{ ('filters.' ~ field)|trans }}
+                    <input type="date" value="{{ filters[field] }}"
+                           data-model="on(change)|filters.{{ field }}"
+                           class="mt-0.5 w-full rounded-lg border border-slate-300 bg-white px-2 py-1 text-xs text-slate-900 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100">
+                </label>
+            {% endfor %}
+        </div>
+    </fieldset>
+</section>
+
+{% macro checkbox(field, key, label, checked) %}
+    <label class="flex items-center gap-2 py-0.5 text-sm text-slate-700 dark:text-slate-300">
+        <input type="checkbox" value="{{ key }}" {{ checked ? 'checked' }}
+               data-action="live#action"
+               data-live-action-param="toggle"
+               data-live-field-param="{{ field }}"
+               data-live-value-param="{{ key }}"
+               class="rounded border-slate-300 text-indigo-600 dark:border-slate-600">
+        {{ label }}
+    </label>
+{% endmacro %}

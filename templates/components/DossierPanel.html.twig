@@ -1,0 +1,24 @@
+{# The pinned decisions. The research controller answers the unpin buttons. #}
+<section {{ attributes.defaults({class: 'panel'}) }}>
+    <h2 class="panel-title">{{ 'dossier.title'|trans }} <span class="text-slate-400">({{ dossier|length }})</span></h2>
+    <ul class="mt-2 space-y-2">
+        {% for decision in dossier %}
+            <li class="group rounded-lg border border-slate-200 p-2 dark:border-slate-700">
+                <div class="flex items-start gap-2">
+                    <a href="{{ this.url(decision.id) }}" target="_blank" rel="noopener noreferrer"
+                       class="flex-1 text-xs font-medium text-slate-800 hover:text-indigo-700 dark:text-slate-200 dark:hover:text-indigo-300">{{ decision.title }}</a>
+                    <button type="button"
+                            data-action="research#unpin"
+                            data-research-id-param="{{ decision.id }}"
+                            title="{{ 'dossier.unpin'|trans }}"
+                            class="shrink-0 text-xs text-slate-400 hover:text-rose-600">✕</button>
+                </div>
+                {% if decision.note is defined and decision.note %}
+                    <p class="mt-1 text-[11px] text-slate-500 dark:text-slate-400">{{ decision.note }}</p>
+                {% endif %}
+            </li>
+        {% else %}
+            <li class="text-xs text-slate-500 dark:text-slate-400">{{ 'dossier.empty'|trans }}</li>
+        {% endfor %}
+    </ul>
+</section>
