@@ -10,9 +10,8 @@ ai:
                 name: 'claude-opus-5-5'
                 options:
                     max_tokens: 16000
-                    # Thinking is always on with Opus 5.5; "summarized" streams a readable
-                    # summary of it to the interface.
-                    thinking: { type: 'adaptive', display: 'summarized' }
+                    # Thinking is always on with Opus 5.5; the interface does not show it.
+                    thinking: { type: 'adaptive' }
                     output_config: { effort: 'high' }
                     # If the model declines for policy reasons, the API retries on its
                     # default fallback model instead of failing the run.

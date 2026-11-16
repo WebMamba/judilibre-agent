@@ -30,3 +30,14 @@ dossier:
     title: Dossier
     empty: "Épinglez des décisions depuis leurs cartes 📌, ou demandez-le à l'assistant."
     unpin: Retirer du dossier
+app:
+    title: Recherche de jurisprudence
+    subtitle: "Un assistant qui cherche pour vous dans Judilibre, l'open data des décisions de justice."
+    new_search: Nouvelle recherche
+chat:
+    welcome: Quelle question de droit voulez-vous éclairer par la jurisprudence ?
+    suggestion: "Ex. : « Un employeur peut-il licencier un salarié en arrêt maladie prolongé ? »"
+    placeholder: Votre question…
+    waiting: Répondez au plan de recherche ci-dessus…
+    send: Envoyer
+    disclaimer: "Aide à la recherche, pas une consultation juridique. Vérifiez toujours les décisions citées."

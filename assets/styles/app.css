@@ -1,5 +1,55 @@
 @import "tailwindcss";
 
+/* Dark mode follows the system (Tailwind v4's default media strategy). */
+@source "../../templates";
+@source "../../src";
+
+html, body {
+    height: 100%;
+}
+
 body {
-    background-color: skyblue;
+    @apply bg-slate-100 text-slate-900 antialiased dark:bg-slate-950 dark:text-slate-100;
+}
+
+/* — Side panels and the conversation — */
+.panel {
+    @apply rounded-xl border border-slate-200 bg-white p-4 shadow-sm dark:border-slate-800 dark:bg-slate-900;
+}
+.panel-title {
+    @apply text-xs font-semibold uppercase tracking-[0.14em] text-slate-500 dark:text-slate-400;
+}
+.panel-label {
+    @apply mb-1 text-[11px] font-medium text-slate-500 dark:text-slate-400;
+}
+
+/* — The assistant's text, rendered from markdown — */
+.assistant-text {
+    @apply leading-relaxed text-slate-800 dark:text-slate-200;
+}
+.assistant-text > * + * { @apply mt-3; }
+.assistant-text :is(h1, h2, h3, h4) { @apply font-semibold text-slate-900 dark:text-slate-100; }
+.assistant-text h1 { @apply text-lg; }
+.assistant-text h2 { @apply text-base; }
+.assistant-text :is(h3, h4) { @apply text-sm; }
+.assistant-text ul { @apply list-disc pl-5; }
+.assistant-text ol { @apply list-decimal pl-5; }
+.assistant-text li + li { @apply mt-1; }
+.assistant-text strong { @apply font-semibold text-slate-900 dark:text-slate-100; }
+.assistant-text a { @apply text-indigo-600 underline underline-offset-2 dark:text-indigo-400; }
+.assistant-text code { @apply rounded bg-slate-100 px-1 py-0.5 font-mono text-[0.85em] dark:bg-slate-800; }
+.assistant-text blockquote { @apply border-l-2 border-slate-300 pl-3 text-slate-600 dark:border-slate-600 dark:text-slate-400; }
+.assistant-text table { @apply w-full border-collapse text-xs; }
+.assistant-text :is(th, td) { @apply border border-slate-200 px-2 py-1 text-left dark:border-slate-700; }
+
+/* Blinking cursor while streaming: after the last word, not on a line of its own */
+.streaming-cursor:empty::after,
+.streaming-cursor > :last-child::after {
+    content: "▍";
+    @apply ml-0.5 inline-block text-indigo-500;
+    animation: blink 1s steps(2, start) infinite;
+}
+
+@keyframes blink {
+    to { visibility: hidden; }
 }
