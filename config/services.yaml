@@ -26,3 +26,7 @@ when@test:
     services:
         App\Tests\Support\FakeJudilibre:
             public: true
+        # Tests script the model's answers instead of calling Anthropic.
+        ai.platform.anthropic:
+            class: Symfony\AI\Platform\Platform
+            factory: ['App\Tests\Support\ScriptedPlatform', 'create']

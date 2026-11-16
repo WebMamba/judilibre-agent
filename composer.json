@@ -7,6 +7,7 @@
         "php": ">=8.4",
         "ext-ctype": "*",
         "ext-iconv": "*",
+        "cweagans/composer-patches": "^2.0",
         "league/commonmark": "^2.10",
         "nyholm/psr7": "^1.8",
         "phpdocumentor/reflection-docblock": "^6.0",
@@ -44,7 +45,8 @@
         "allow-plugins": {
             "php-http/discovery": true,
             "symfony/flex": true,
-            "symfony/runtime": true
+            "symfony/runtime": true,
+            "cweagans/composer-patches": true
         },
         "bump-after-update": true,
         "sort-packages": true
@@ -91,6 +93,11 @@
         "symfony": {
             "allow-contrib": false,
             "require": "8.1.*"
+        },
+        "patches": {
+            "webmamba/ag-ui-symfony-ai-bridge": {
+                "Send the state changes a resumed tool makes as a state delta (fix sent upstream to WebMamba/ag-ui-php)": "patches/ag-ui-bridge-state-delta-on-resume.patch"
+            }
         }
     },
     "require-dev": {
