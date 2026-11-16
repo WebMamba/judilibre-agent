@@ -1,0 +1,51 @@
+{
+    "page": 0,
+    "page_size": 10,
+    "query": {"query": "licenciement arrêt maladie", "operator": "and", "jurisdiction": ["cc"], "chamber": ["soc"]},
+    "total": 2,
+    "previous_page": null,
+    "next_page": null,
+    "took": 12,
+    "max_score": 0.92,
+    "relaxed": false,
+    "results": [
+        {
+            "score": 0.92,
+            "highlights": {"motivations": ["Le <em>licenciement</em> d'un salarié en <em>arrêt maladie</em> ne peut être justifié que par…"]},
+            "id": "65f1c0a2b4e3d2001a7c9e11",
+            "jurisdiction": "cc",
+            "chamber": "soc",
+            "number": "22-18.457",
+            "numbers": ["22-18.457"],
+            "ecli": "ECLI:FR:CCASS:2024:SO00321",
+            "formation": "f",
+            "publication": ["b"],
+            "decision_date": "2024-03-13",
+            "type": "arret",
+            "solution": "cassation",
+            "solution_alt": null,
+            "summary": "Le licenciement motivé par la désorganisation de l'entreprise suppose le remplacement définitif du salarié absent.",
+            "bulletin": null,
+            "files": [],
+            "themes": ["Contrat de travail, rupture"]
+        },
+        {
+            "score": 0.71,
+            "highlights": {},
+            "id": "60794a6e9ba5988459c4a2f0",
+            "jurisdiction": "cc",
+            "chamber": "soc",
+            "number": "19-22.557",
+            "numbers": ["19-22.557"],
+            "ecli": "ECLI:FR:CCASS:2021:SO00512",
+            "formation": "fs",
+            "publication": [],
+            "decision_date": "2021-04-14",
+            "type": "arret",
+            "solution": "rejet",
+            "summary": null,
+            "files": [],
+            "themes": []
+        }
+    ]
+}

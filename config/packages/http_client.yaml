@@ -1,0 +1,13 @@
+framework:
+    http_client:
+        scoped_clients:
+            # Autowired as `HttpClientInterface $judilibreClient`.
+            judilibre.client:
+                base_uri: '%env(JUDILIBRE_BASE_URL)%'
+                headers:
+                    KeyId: '%env(JUDILIBRE_KEY_ID)%'
+                    Accept: 'application/json'
+                timeout: 20
+                retry_failed:
+                    max_retries: 2
+                    http_codes: [429, 502, 503, 504]
