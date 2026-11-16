@@ -10,3 +10,8 @@ plan:
         and: tous les termes
         or: l'un des termes
         exact: expression exacte
+decision:
+    pin: Épingler
+    summary: Sommaire
+    unpublished: Inédit
+    missing: "Décision %id% introuvable dans Judilibre."

@@ -12,14 +12,14 @@ use Symfony\Component\HttpClient\Response\MockResponse;
 
 /**
  * Judilibre without the network: answers from tests/Fixtures/judilibre and records the
- * URLs asked for.
+ * URLs asked for. In the test kernel it is the HttpClient's mock response factory.
  */
 final class FakeJudilibre
 {
     /** @var list<string> */
     public array $requests = [];
 
-    /** @var array<string, MockResponse|\Closure(): MockResponse> path => response */
+    /** @var array<string, MockResponse> endpoint (search, decision…) => response */
     private array $responses = [];
 
     public function __construct()
@@ -38,23 +38,26 @@ final class FakeJudilibre
         return new MockResponse($body, ['http_code' => $status, 'response_headers' => ['content-type' => 'application/json']]);
     }
 
-    public function respond(string $path, MockResponse $response): self
+    public function respond(string $endpoint, MockResponse $response): self
     {
-        $this->responses[$path] = $response;
+        $this->responses[$endpoint] = $response;
 
         return $this;
     }
 
+    /** The mock response factory: answers by the last segment of the path. */
+    public function __invoke(string $method, string $url): MockResponse
+    {
+        $this->requests[] = $url;
+        $endpoint = basename((string) parse_url($url, \PHP_URL_PATH));
+
+        // A MockResponse is consumed once: hand out a copy.
+        return clone ($this->responses[$endpoint] ?? self::json('{"message":"Not found"}', 404));
+    }
+
     public function client(): JudilibreClient
     {
-        return new JudilibreClient(new MockHttpClient(function (string $method, string $url): MockResponse {
-            $this->requests[] = $url;
-            $path = (string) preg_replace('~^https://judilibre\.test/|\?.*$~', '', $url);
-            $response = $this->responses[$path] ?? self::json('{"message":"not found"}', 404);
-
-            // A MockResponse can be consumed once: hand out a copy.
-            return clone $response;
-        }, 'https://judilibre.test/'));
+        return new JudilibreClient(new MockHttpClient($this, 'https://judilibre.test/'));
     }
 
     public function catalog(): DecisionCatalog
@@ -62,12 +65,15 @@ final class FakeJudilibre
         return new DecisionCatalog($this->client(), new ArrayAdapter());
     }
 
-    /** The query of the n-th request, decoded (`chamber[]` → `chamber`). */
+    /**
+     * The query of the n-th request, decoded (`chamber[]` → `chamber`).
+     *
+     * @return array<string, string|list<string>>
+     */
     public function query(int $index = 0): array
     {
-        $query = (string) parse_url($this->requests[$index], \PHP_URL_QUERY);
         $parameters = [];
-        foreach (explode('&', $query) as $pair) {
+        foreach (explode('&', (string) parse_url($this->requests[$index], \PHP_URL_QUERY)) as $pair) {
             [$name, $value] = array_map('rawurldecode', explode('=', $pair, 2));
             if (str_ends_with($name, '[]')) {
                 $parameters[substr($name, 0, -2)][] = $value;

@@ -1,0 +1,51 @@
+{# The agent gives ids and relevance; citation, solution and link come from Judilibre.
+   The pin button is answered by the research controller, which owns the shared state. #}
+<div class="agent-component my-3 overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm dark:border-slate-700 dark:bg-slate-900">
+    {% if title %}
+        <div class="border-b border-slate-100 bg-slate-50 px-4 py-3 text-sm font-semibold text-slate-900 dark:border-slate-800 dark:bg-slate-800/60 dark:text-slate-100">{{ title }}</div>
+    {% endif %}
+    <ul class="divide-y divide-slate-100 dark:divide-slate-800">
+        {% for card in this.cards %}
+            <li class="px-4 py-3">
+                {% if card.found %}
+                    <div class="flex items-start gap-3">
+                        <div class="min-w-0 flex-1">
+                            <a href="{{ card.url }}" target="_blank" rel="noopener noreferrer"
+                               class="text-sm font-semibold text-slate-900 hover:text-indigo-700 dark:text-slate-100 dark:hover:text-indigo-300">{{ card.citation }}</a>
+                            <div class="mt-1 flex flex-wrap gap-1.5 text-[11px]">
+                                {% if card.solution %}
+                                    <span class="rounded-full bg-slate-100 px-2 py-0.5 text-slate-700 dark:bg-slate-800 dark:text-slate-300">{{ card.solution }}</span>
+                                {% endif %}
+                                {% for publication in card.publications %}
+                                    <span class="rounded-full bg-indigo-50 px-2 py-0.5 text-indigo-700 dark:bg-indigo-950 dark:text-indigo-300">{{ publication }}</span>
+                                {% else %}
+                                    <span class="rounded-full bg-slate-50 px-2 py-0.5 text-slate-500 dark:bg-slate-800/60 dark:text-slate-400">{{ 'decision.unpublished'|trans }}</span>
+                                {% endfor %}
+                            </div>
+                            {% if card.relevance %}
+                                <p class="mt-2 text-sm text-slate-700 dark:text-slate-300">{{ card.relevance }}</p>
+                            {% endif %}
+                            {% if card.summary %}
+                                <details class="mt-1 text-xs text-slate-500 dark:text-slate-400">
+                                    <summary class="cursor-pointer select-none">{{ 'decision.summary'|trans }}</summary>
+                                    <p class="mt-1">{{ card.summary }}</p>
+                                </details>
+                            {% endif %}
+                        </div>
+                        <button type="button"
+                                data-action="research#pin"
+                                data-research-id-param="{{ card.id }}"
+                                data-research-title-param="{{ card.citation }}"
+                                data-research-note-param="{{ card.relevance }}"
+                                title="{{ 'decision.pin'|trans }}"
+                                class="shrink-0 rounded-lg border border-slate-200 px-2 py-1 text-xs text-slate-600 hover:bg-slate-50 dark:border-slate-700 dark:text-slate-300 dark:hover:bg-slate-800">
+                            📌 {{ 'decision.pin'|trans }}
+                        </button>
+                    </div>
+                {% else %}
+                    <div class="text-sm text-rose-700 dark:text-rose-400">{{ 'decision.missing'|trans({'%id%': card.id}) }}</div>
+                {% endif %}
+            </li>
+        {% endfor %}
+    </ul>
+</div>

@@ -11,3 +11,9 @@ framework:
                 retry_failed:
                     max_retries: 2
                     http_codes: [429, 502, 503, 504]
+
+when@test:
+    framework:
+        http_client:
+            # No network in tests: Judilibre answers from tests/Fixtures/judilibre.
+            mock_response_factory: App\Tests\Support\FakeJudilibre
