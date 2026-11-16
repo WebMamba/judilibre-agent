@@ -1,0 +1,63 @@
+{# Shown through the interrupt's ACTIVITY_SNAPSHOT. ag-ui-activities marks it with the
+   interrupt's id, so its buttons answer it with ag-ui#resume. The search-plan controller
+   reveals the instruction field and copies its text into the feedback param. #}
+<div class="agent-component my-3 rounded-2xl border border-amber-300 bg-amber-50 p-4 dark:border-amber-700 dark:bg-amber-950/40"
+     data-interrupt data-controller="search-plan">
+    <div class="text-xs font-semibold uppercase tracking-wide text-amber-700 dark:text-amber-400">{{ 'plan.title'|trans }}</div>
+
+    <ol class="mt-2 space-y-2">
+        {% for search in searches %}
+            <li class="text-sm text-slate-800 dark:text-slate-100">
+                <span class="font-semibold">« {{ search.query }} »</span>
+                <span class="text-xs text-slate-500 dark:text-slate-400">
+                    · {{ ('plan.operator.' ~ search.operator)|trans }}
+                    {%- if search.fields is not empty %} · {{ 'plan.fields'|trans }} {{ search.fields|join(', ') }}{% endif %}
+                </span>
+                {% if search.purpose %}
+                    <div class="text-xs text-slate-600 dark:text-slate-300">{{ search.purpose }}</div>
+                {% endif %}
+            </li>
+        {% endfor %}
+    </ol>
+
+    <div class="mt-3 rounded-xl bg-white/70 px-3 py-2 text-xs text-slate-600 dark:bg-slate-900/50 dark:text-slate-300">
+        {% for line in filters %}<div>{{ line }}</div>{% endfor %}
+    </div>
+
+    <div class="mt-3 flex flex-wrap gap-2" data-search-plan-target="choices">
+        <button type="button"
+                data-action="ag-ui#resume"
+                data-ag-ui-approved-param="true"
+                class="rounded-xl bg-amber-500 px-3 py-1.5 text-sm font-medium text-white hover:bg-amber-400 disabled:opacity-50">
+            {{ 'plan.approve'|trans }}
+        </button>
+        <button type="button"
+                data-action="search-plan#edit"
+                class="rounded-xl border border-amber-400 px-3 py-1.5 text-sm text-amber-800 hover:bg-white disabled:opacity-50 dark:text-amber-300 dark:hover:bg-slate-800">
+            {{ 'plan.edit'|trans }}
+        </button>
+        <button type="button"
+                data-action="ag-ui#resume"
+                data-ag-ui-approved-param="false"
+                class="rounded-xl border border-slate-300 px-3 py-1.5 text-sm text-slate-700 hover:bg-white disabled:opacity-50 dark:border-slate-600 dark:text-slate-200 dark:hover:bg-slate-800">
+            {{ 'plan.decline'|trans }}
+        </button>
+    </div>
+
+    <div class="mt-3 hidden" data-search-plan-target="instruction">
+        <textarea rows="2"
+                  data-search-plan-target="feedback"
+                  data-action="input->search-plan#write"
+                  placeholder="{{ 'plan.instruction_placeholder'|trans }}"
+                  class="w-full rounded-xl border border-amber-300 bg-white p-2 text-sm text-slate-900 dark:border-amber-700 dark:bg-slate-900 dark:text-slate-100"></textarea>
+        <button type="button"
+                data-search-plan-target="send"
+                data-action="ag-ui#resume"
+                data-ag-ui-approved-param="false"
+                data-ag-ui-feedback-param=""
+                disabled
+                class="mt-2 rounded-xl bg-amber-500 px-3 py-1.5 text-sm font-medium text-white hover:bg-amber-400 disabled:opacity-50">
+            {{ 'plan.send_instruction'|trans }}
+        </button>
+    </div>
+</div>

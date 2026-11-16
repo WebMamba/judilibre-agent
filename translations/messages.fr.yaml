@@ -1,0 +1,12 @@
+plan:
+    title: Plan de recherche
+    approve: Lancer
+    edit: Modifier
+    decline: Non
+    fields: 'champs :'
+    instruction_placeholder: "Ex. : cherche aussi du côté de la chambre commerciale"
+    send_instruction: Envoyer la consigne
+    operator:
+        and: tous les termes
+        or: l'un des termes
+        exact: expression exacte
