@@ -66,11 +66,6 @@ Comment ça marche
    localStorage du navigateur par `assets/controllers/research_controller.js`.
  * Le vocabulaire : [CONTEXT.md](CONTEXT.md) ; les décisions : [docs/adr](docs/adr).
 
-Le bridge AG-UI est patché (`patches/`, appliqué par `cweagans/composer-patches`) pour
-envoyer au navigateur les changements d'état faits à la reprise d'un interrupt : sans
-lui, un plan approuvé serait oublié au message suivant. Le correctif est proposé en
-amont ; retirez le patch une fois publié.
-
 Tests
 -----
 
