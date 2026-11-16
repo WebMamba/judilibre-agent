@@ -39,9 +39,9 @@ Les clés vont dans `.env.local`, jamais commité :
 
 ```dotenv
 ANTHROPIC_API_KEY=sk-ant-...
-JUDILIBRE_KEY_ID=...
-# Bac à sable par défaut ; en production :
-# JUDILIBRE_BASE_URL=https://api.piste.gouv.fr/cassation/judilibre/v1.0/
+JUDILIBRE_KEY_ID=...   # la clé d'API PISTE, pas un identifiant OAuth
+# Production par défaut ; une clé du bac à sable va avec :
+# JUDILIBRE_BASE_URL=https://sandbox-api.piste.gouv.fr/cassation/judilibre/v1.0/
 ```
 
 Lancement
