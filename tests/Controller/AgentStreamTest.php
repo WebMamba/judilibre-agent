@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Tests\Controller;
 
+use App\Security\EnvUserProvider;
 use App\Tests\Support\FakeJudilibre;
 use App\Tests\Support\ScriptedPlatform;
 use Symfony\AI\Platform\Result\Stream\Delta\TextDelta;
@@ -27,6 +28,7 @@ final class AgentStreamTest extends WebTestCase
     {
         ScriptedPlatform::reset();
         $this->client = self::createClient();
+        $this->client->loginUser(self::getContainer()->get(EnvUserProvider::class)->loadUserByIdentifier('juriste@example.com'));
     }
 
     public function testTheUserApprovesThePlanThenGetsDecisionCards(): void

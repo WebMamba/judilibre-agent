@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Tests\Controller;
 
+use App\Security\EnvUserProvider;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 
 final class ResearchPageTest extends WebTestCase
@@ -11,6 +12,7 @@ final class ResearchPageTest extends WebTestCase
     public function testThePageWiresTheChatThePanelsAndTheAgUiClient(): void
     {
         $client = self::createClient();
+        $client->loginUser(self::getContainer()->get(EnvUserProvider::class)->loadUserByIdentifier('juriste@example.com'));
         $crawler = $client->request('GET', '/');
 
         self::assertResponseIsSuccessful();

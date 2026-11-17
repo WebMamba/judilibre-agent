@@ -10,6 +10,7 @@ use AgUi\Bundle\Http\AgUiResponse;
 use AgUi\Run\RunAgentInput;
 use App\Research\ResearchState;
 use Symfony\AI\Agent\AgentInterface;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Exception\UnprocessableEntityHttpException;
 use Symfony\Component\Routing\Attribute\Route;
 
@@ -21,8 +22,14 @@ use Symfony\Component\Routing\Attribute\Route;
 final readonly class StreamController
 {
     #[Route('/agent/stream', name: 'agent_stream', methods: ['POST'])]
-    public function __invoke(RunAgentInput $input, AgentInterface $researcher, AgUi $agUi, ResearchState $state): AgUiResponse
+    public function __invoke(Request $request, RunAgentInput $input, AgentInterface $researcher, AgUi $agUi, ResearchState $state): AgUiResponse
     {
+        // A run streams for a minute or more: release the session lock first, or the
+        // Live Components of the page would wait for the run to end.
+        if ($request->hasSession() && $request->getSession()->isStarted()) {
+            $request->getSession()->save();
+        }
+
         try {
             return new AgUiResponse($agUi->run($input, $researcher, state: $state));
         } catch (InvalidStateException $e) {

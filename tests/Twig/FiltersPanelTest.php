@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Tests\Twig;
 
+use App\Security\EnvUserProvider;
 use App\Tests\Support\FakeJudilibre;
 use Symfony\Bundle\FrameworkBundle\KernelBrowser;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
@@ -23,6 +24,7 @@ final class FiltersPanelTest extends WebTestCase
     protected function setUp(): void
     {
         $this->client = self::createClient();
+        $this->client->loginUser(self::getContainer()->get(EnvUserProvider::class)->loadUserByIdentifier('juriste@example.com'));
     }
 
     public function testItStartsOnTheCourDeCassationWithItsChambersFromJudilibre(): void

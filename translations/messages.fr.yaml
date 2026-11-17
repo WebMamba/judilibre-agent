@@ -41,3 +41,11 @@ chat:
     waiting: Répondez au plan de recherche ci-dessus…
     send: Envoyer
     disclaimer: "Aide à la recherche, pas une consultation juridique. Vérifiez toujours les décisions citées."
+login:
+    title: Connexion
+    intro: Accès réservé. Connectez-vous avec votre e-mail.
+    email: E-mail
+    password: Mot de passe
+    submit: Se connecter
+    error: E-mail ou mot de passe incorrect.
+    logout: Déconnexion
