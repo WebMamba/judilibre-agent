@@ -39,6 +39,7 @@ Les clés vont dans `.env.local`, jamais commité :
 
 ```dotenv
 ANTHROPIC_API_KEY=sk-ant-...
+APP_USERS='{"vous@example.fr":"<hachage>"}'   # php bin/console security:hash-password
 JUDILIBRE_KEY_ID=...   # la clé d'API PISTE, pas un identifiant OAuth
 # Production par défaut ; une clé du bac à sable va avec :
 # JUDILIBRE_BASE_URL=https://sandbox-api.piste.gouv.fr/cassation/judilibre/v1.0/
@@ -52,9 +53,9 @@ symfony server:start -d
 php bin/console tailwind:build --watch   # pendant que vous modifiez templates ou CSS
 ```
 
-> [!CAUTION]
-> `POST /agent/stream` n'a ni authentification ni limite de débit : quiconque y accède
-> consomme vos crédits Anthropic et votre quota PISTE. Ne l'exposez pas tel quel.
+> [!NOTE]
+> Il n'y a pas de limite d'utilisation : chaque compte connecté consomme vos crédits
+> Anthropic et votre quota PISTE sans plafond.
 
 Comment ça marche
 -----------------
@@ -65,6 +66,26 @@ Comment ça marche
    affiché par les Live Components `FiltersPanel` et `DossierPanel`, et gardé dans le
    localStorage du navigateur par `assets/controllers/research_controller.js`.
  * Le vocabulaire : [CONTEXT.md](CONTEXT.md) ; les décisions : [docs/adr](docs/adr).
+
+Déploiement
+-----------
+
+Sur un VPS avec Docker : FrankenPHP sert l'application et obtient le certificat HTTPS.
+L'accès est réservé aux comptes de `APP_USERS` (e-mail => hachage du mot de passe).
+
+Une fois, sur le VPS :
+
+```bash
+git clone git@github.com:WebMamba/judilibre-agent.git /srv/judilibre-agent   # avec une deploy key en lecture
+cd /srv/judilibre-agent
+cp deploy/env.prod.local.dist .env.prod.local && chmod 600 .env.prod.local     # puis le remplir
+./deploy/deploy.sh
+```
+
+Ensuite, chaque push sur `main` déploie, une fois les tests verts (`.github/workflows/ci.yml`).
+Dans le dépôt GitHub : la variable `DEPLOY_ENABLED=true`, et les secrets `DEPLOY_HOST`,
+`DEPLOY_USER`, `DEPLOY_PATH` (`/srv/judilibre-agent`), `DEPLOY_SSH_KEY` (une clé privée
+autorisée sur le VPS) et `DEPLOY_KNOWN_HOSTS` (`ssh-keyscan <hôte>`).
 
 Tests
 -----

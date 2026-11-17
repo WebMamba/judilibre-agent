@@ -1,0 +1,23 @@
+{
+	frankenphp
+}
+
+# SERVER_NAME: the domain (HTTPS via Let's Encrypt), or ":80" for plain HTTP.
+{$SERVER_NAME:localhost} {
+	root /app/public
+
+	# Compress the compiled assets only: compressing /agent/stream would buffer its
+	# Server-Sent Events, and the conversation would arrive all at once.
+	@assets path /assets/*
+	encode @assets zstd br gzip
+	header @assets Cache-Control "public, max-age=31536000, immutable"
+
+	header {
+		Strict-Transport-Security "max-age=31536000"
+		X-Content-Type-Options "nosniff"
+		Referrer-Policy "same-origin"
+		-Server
+	}
+
+	php_server
+}

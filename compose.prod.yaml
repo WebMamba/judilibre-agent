@@ -1,0 +1,23 @@
+# Production, on the VPS: see deploy/deploy.sh.
+#   docker compose --env-file .env.prod.local -f compose.prod.yaml up -d --build
+services:
+  app:
+    build: .
+    image: judilibre-agent
+    restart: unless-stopped
+    environment:
+      SERVER_NAME: ${SERVER_NAME:?Set SERVER_NAME (the domain) in .env.prod.local}
+    volumes:
+      # The secrets: API keys, APP_SECRET, APP_USERS. Never in the image or the repository.
+      - ./.env.prod.local:/app/.env.prod.local:ro
+      # Caddy's certificates, kept across deploys.
+      - caddy_data:/data
+      - caddy_config:/config
+    ports:
+      - "80:80"
+      - "443:443"
+      - "443:443/udp"
+
+volumes:
+  caddy_data:
+  caddy_config:
