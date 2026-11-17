@@ -11,7 +11,7 @@
 
     {% if error %}
         <div role="alert" class="mt-4 rounded-lg bg-rose-50 px-3 py-2 text-sm text-rose-700 dark:bg-rose-950/50 dark:text-rose-300">
-            {{ 'login.error'|trans }}
+            {{ (error.messageKey starts with 'Too many' ? 'login.throttled' : 'login.error')|trans }}
         </div>
     {% endif %}
 

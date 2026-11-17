@@ -49,3 +49,4 @@ login:
     submit: Se connecter
     error: E-mail ou mot de passe incorrect.
     logout: Déconnexion
+    throttled: "Trop de tentatives de connexion : réessayez dans quelques minutes."
