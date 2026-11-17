@@ -83,9 +83,9 @@ cp deploy/env.prod.local.dist .env.prod.local && chmod 600 .env.prod.local     #
 ```
 
 Ensuite, chaque push sur `main` déploie, une fois les tests verts (`.github/workflows/ci.yml`).
-Dans le dépôt GitHub : la variable `DEPLOY_ENABLED=true`, et les secrets `DEPLOY_HOST`,
-`DEPLOY_USER`, `DEPLOY_PATH` (`/srv/judilibre-agent`), `DEPLOY_SSH_KEY` (une clé privée
-autorisée sur le VPS) et `DEPLOY_KNOWN_HOSTS` (`ssh-keyscan <hôte>`).
+Le serveur (`deploy@72.61.193.89`, `/srv/judilibre-agent`) est écrit dans le workflow.
+Dans le dépôt GitHub : la variable `DEPLOY_ENABLED=true`, et les secrets `DEPLOY_SSH_KEY`
+(une clé privée autorisée sur le VPS) et `DEPLOY_KNOW_HOSTS` (`ssh-keyscan 72.61.193.89`).
 
 Tests
 -----
