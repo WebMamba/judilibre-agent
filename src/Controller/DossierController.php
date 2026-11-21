@@ -83,6 +83,17 @@ final class DossierController extends AbstractController
         ]);
     }
 
+    /**
+     * The saved state: the browser reads it after each run, since a tool that interrupts
+     * the run changes the state without a STATE_DELTA.
+     */
+    #[Route('/dossiers/{id}/state', name: 'dossier_state', methods: ['GET'])]
+    #[IsGranted(DossierVoter::OWN, 'dossier')]
+    public function state(#[MapEntity] Dossier $dossier): JsonResponse
+    {
+        return new JsonResponse(['state' => $dossier->getState(), 'title' => $dossier->getTitle()]);
+    }
+
     #[Route('/dossiers/{id}/rename', name: 'dossier_rename', methods: ['POST'])]
     #[IsGranted(DossierVoter::OWN, 'dossier')]
     #[IsCsrfTokenValid('dossier', tokenKey: '_token')]

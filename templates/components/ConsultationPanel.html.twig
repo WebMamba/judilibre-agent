@@ -18,7 +18,7 @@
                         🔁 {{ 'document.resume_research'|trans }}
                     </button>
                 {% endif %}
-                <a href="{{ path('dossier_docx', {id: dossierId}) }}"
+                <a href="{{ path('dossier_docx', {id: dossierId}) }}" data-turbo="false" download
                    class="rounded-lg bg-indigo-600 px-3 py-1.5 text-xs font-medium text-white hover:bg-indigo-500">⬇︎ {{ 'document.export'|trans }}</a>
             </div>
         {% endif %}

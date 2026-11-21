@@ -33,6 +33,23 @@ export default class extends Controller {
         if (window.location.pathname !== this.urlValue) window.history.replaceState({}, '', this.urlValue);
     }
 
+    /**
+     * ag-ui:idle — the run is over: read the saved state, which holds what a tool that
+     * interrupted the run changed (no STATE_DELTA carries it).
+     */
+    async runEnded() {
+        try {
+            const response = await fetch(`${this.urlValue}/state`, { headers: { Accept: 'application/json' } });
+            if (!response.ok) return;
+            const { state, title } = await response.json();
+            if (!state || Object.keys(state).length === 0) return;
+            this.state = { ...state, title: state.title || title };
+            this.publish();
+        } catch {
+            // The live state stays: the next page load brings the saved one.
+        }
+    }
+
     /** ag-ui:state-changed — from the agent (STATE_DELTA) or from publish(). */
     stateChanged({ detail: { state } }) {
         this.state = state;

@@ -69,12 +69,18 @@ final class TranscriptView
                 $activity = $activities['act_'.$id] ?? null;
                 if (null !== $activity && 'twig_component' === ($activity['activityType'] ?? null)) {
                     $interruptId = $activity['content']['interruptId'] ?? null;
+                    $answered = \is_string($interruptId) && !isset($open[$interruptId]);
+                    // An answered form shows the answers, not empty fields again.
+                    if ($answered && 'ask_questions' === ($call['function']['name'] ?? null) && isset($results[$id])) {
+                        $current['items'][] = ['type' => 'answers', 'text' => $results[$id]];
+                        continue;
+                    }
                     $current['items'][] = [
                         'type' => 'activity',
                         'id' => 'act_'.$id,
                         'html' => (string) ($activity['content']['html'] ?? ''),
                         'interruptId' => \is_string($interruptId) && isset($open[$interruptId]) ? $interruptId : null,
-                        'answered' => \is_string($interruptId) && !isset($open[$interruptId]),
+                        'answered' => $answered,
                     ];
                     continue;
                 }
@@ -103,7 +109,7 @@ final class TranscriptView
             return $label.' — '.$decoded['citation'];
         }
         if ('write_section' === $name) {
-            return $label.' — '.strtok($result, "\n");
+            return $label.' — '.(preg_split('/(?<=\.)\s/u', $result)[0] ?? $result);
         }
 
         return $label;

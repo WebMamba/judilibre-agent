@@ -19,7 +19,7 @@
             {% for field in ['facts', 'issue', 'side', 'goal'] %}
                 <label class="mt-2 block text-xs font-medium text-slate-600 dark:text-slate-300">{{ ('brief.' ~ field)|trans }}</label>
                 <textarea rows="{{ field == 'facts' ? 3 : 1 }}" data-research-plan-target="brief" data-field="{{ field }}" data-action="input->research-plan#collect"
-                          class="plan-input">{{ brief[field] ?? '' }}</textarea>
+                          class="plan-input grow-input">{{ brief[field] ?? '' }}</textarea>
             {% endfor %}
         </div>
     {% endif %}
@@ -29,8 +29,8 @@
         {% for axis in axes %}
             <li class="flex items-start gap-2" data-research-plan-target="axis">
                 <div class="flex-1 space-y-1">
-                    <input type="text" value="{{ axis.title }}" data-role="title" data-action="input->research-plan#collect" class="plan-input font-medium">
-                    <input type="text" value="{{ axis.objective }}" data-role="objective" placeholder="{{ 'plan.objective'|trans }}" data-action="input->research-plan#collect" class="plan-input text-xs">
+                    <textarea rows="1" data-role="title" data-action="input->research-plan#collect" class="plan-input grow-input font-medium">{{ axis.title }}</textarea>
+                    <textarea rows="1" data-role="objective" placeholder="{{ 'plan.objective'|trans }}" data-action="input->research-plan#collect" class="plan-input grow-input text-xs">{{ axis.objective }}</textarea>
                 </div>
                 <button type="button" data-action="research-plan#remove" title="{{ 'plan.remove_axis'|trans }}" data-interrupt-control
                         class="mt-1 rounded-lg px-2 py-1 text-xs text-slate-400 hover:bg-white hover:text-rose-600 dark:hover:bg-slate-800">✕</button>
@@ -40,8 +40,8 @@
     <template data-research-plan-target="template">
         <li class="flex items-start gap-2" data-research-plan-target="axis">
             <div class="flex-1 space-y-1">
-                <input type="text" value="" data-role="title" placeholder="{{ 'plan.new_axis'|trans }}" data-action="input->research-plan#collect" class="plan-input font-medium">
-                <input type="text" value="" data-role="objective" placeholder="{{ 'plan.objective'|trans }}" data-action="input->research-plan#collect" class="plan-input text-xs">
+                <textarea rows="1" data-role="title" placeholder="{{ 'plan.new_axis'|trans }}" data-action="input->research-plan#collect" class="plan-input grow-input font-medium"></textarea>
+                <textarea rows="1" data-role="objective" placeholder="{{ 'plan.objective'|trans }}" data-action="input->research-plan#collect" class="plan-input grow-input text-xs"></textarea>
             </div>
             <button type="button" data-action="research-plan#remove" title="{{ 'plan.remove_axis'|trans }}" data-interrupt-control
                     class="mt-1 rounded-lg px-2 py-1 text-xs text-slate-400 hover:bg-white hover:text-rose-600 dark:hover:bg-slate-800">✕</button>

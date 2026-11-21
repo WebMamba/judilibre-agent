@@ -68,7 +68,8 @@ final class DossierPagesTest extends WebTestCase
         self::assertSelectorTextContains('[data-agent-chat-target="messages"]', 'Mon client a été licencié');
         self::assertSelectorExists('.assistant-text strong');
         self::assertStringNotContainsString('<script>alert(1)</script>', $this->client->getInternalResponse()->getContent(), 'The model\'s HTML is escaped.');
-        self::assertSelectorExists('[data-ag-ui-activity="act_c1"].answered');
+        self::assertSelectorNotExists('[data-ag-ui-activity="act_c1"]', 'An answered form shows its answers instead.');
+        self::assertSelectorTextContains('[data-agent-chat-target="messages"]', 'Réponses');
         self::assertSelectorTextContains('.tool-call', 'Rédaction — Section « Faits » rédigée.');
         self::assertSelectorTextContains('#consultation-panel', 'Cour de cassation, Chambre sociale, 13 mars 2024');
         self::assertSelectorTextContains('#consultation-panel', 'Annexe — Décisions citées');

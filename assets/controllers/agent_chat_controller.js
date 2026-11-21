@@ -182,7 +182,8 @@ export default class extends Controller {
             return String(content).slice(0, 160);
         }
         if (name === 'read_decision') return result.citation ?? String(content).slice(0, 140);
-        if (['set_filters', 'write_section'].includes(name)) return String(content).split('\n')[0];
+        if (name === 'write_section') return String(content).split(/(?<=\.)\s/)[0];
+        if (name === 'set_filters') return String(content).split('\n')[0];
         return null;
     }
 
