@@ -10,6 +10,8 @@ services:
     volumes:
       # The secrets: API keys, APP_SECRET, APP_USERS. Never in the image or the repository.
       - ./.env.prod.local:/app/.env.prod.local:ro
+      # The dossiers (SQLite) and the locks, kept across deploys.
+      - app_data:/app/var/data
       # Caddy's certificates, kept across deploys.
       - caddy_data:/data
       - caddy_config:/config
@@ -19,5 +21,6 @@ services:
       - "443:443/udp"
 
 volumes:
+  app_data:
   caddy_data:
   caddy_config:

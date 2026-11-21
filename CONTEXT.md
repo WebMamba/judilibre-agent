@@ -23,30 +23,48 @@ prompt en français.
 - **Taxonomie** (`taxonomy`) — les valeurs possibles d'un filtre, servies par
   `GET /taxonomy`.
 
+## Le dossier
+
+- **Dossier** (`Dossier`, entité Doctrine) — un thread AG-UI : la conversation, l'état
+  de recherche et les interrupts ouverts, d'un seul utilisateur. Le serveur le garde
+  entre deux runs.
+- **Phase** (`Phase`) — où en est le dossier : `qualification`, `plan`, `recherche`,
+  `selection`, `cadrage`, `redaction`, `livre`. Chaque tool n'est permis que dans
+  certaines phases.
+- **Partie défendue** (`CaseBrief::side`) — qui l'avocat défend, et sa position.
+- **Fiche dossier** (`CaseBrief`) — les faits anonymisés, la question de droit, la
+  partie défendue et l'objectif, validés par l'utilisateur. Seule partie du dossier
+  envoyée au modèle de tri.
+- **Axe de recherche** (`Axis`) — une piste du plan : un intitulé, un objectif, un tour.
+  L'agent le traduit en requêtes Judilibre.
+- **Plan de recherche** (`SearchPlan`) — les axes validés, tour après tour.
+- **Tri** (`Triage`, `JevTriage`) — le classement de chaque décision trouvée par Jev :
+  favorable, défavorable, contexte ou hors sujet.
+- **Sens** (`Stance`) — ce qu'une décision ou un principe fait pour la partie défendue.
+- **Décision retenue** (`RetainedDecision`) — une décision gardée par le tri ; seules
+  celles-ci (et les épinglées) peuvent être montrées ou citées.
+- **Principe** (`Principle`) — une règle dégagée par la jurisprudence, avec les
+  décisions qui la posent ou l'appliquent.
+- **Épingler / Retenir / Écarter** — l'utilisateur épingle une décision (`dossier`),
+  retient un principe (`pinnedPrinciples`), écarte une décision (`excluded`).
+- **Cadrage** — les questions avant la rédaction : destinataire, niveau de détail,
+  arguments.
+- **Consultation** (`Consultation`) — le livrable : six sections en Markdown, l'annexe
+  des décisions citées, l'avertissement. Une décision s'y cite `[[id]]`.
+
 ## La recherche
 
-- **Recherche** (`search_decisions`) — un appel à `GET /search` de Judilibre : une requête
-  plein texte, un opérateur (`or`, `and`, `exact`), éventuellement des champs (zones).
-  Toujours contrainte par les filtres.
+- **Recherche** (`search_axis`) — jusqu'à trois appels à `GET /search` de Judilibre pour
+  un axe, toujours contraints par les filtres, puis le tri.
 - **Filtres** (`SearchFilters`) — juridictions, chambres, publications, période. Ils
-  s'imposent à toutes les recherches de l'agent. L'agent les change avec `set_filters`,
-  et l'utilisateur dans le panneau des filtres.
-- **Plan de recherche** (`SearchPlan`) — les recherches que l'agent compte lancer pour une
-  question, avec les filtres en vigueur. Il est proposé avec `propose_search_plan` et doit
-  être **approuvé** par l'utilisateur avant toute recherche.
-- **Dossier** (`Dossier`) — les décisions épinglées (`PinnedDecision`), chacune avec une
-  note. L'utilisateur et l'agent l'alimentent.
-- **État de recherche** (`ResearchState`) — l'état partagé AG-UI : filtres, plan
-  approuvé et dossier. Il vit dans le navigateur (et dans localStorage), et le serveur
-  le reçoit à chaque run.
+  s'imposent à toutes les recherches. L'agent les change avec `set_filters`, et
+  l'utilisateur dans le panneau des filtres.
 
 ## L'agent
 
-- **Agent** (`researcher`) — l'agent Symfony AI déclaré dans `config/packages/ai.yaml`.
+- **Agent** (`researcher`) — l'agent Symfony AI déclaré dans `config/packages/ai.yaml`
+  (Claude Opus).
 - **Run** — un tour de l'agent, servi en Server-Sent Events par `POST /agent/stream`
-  (protocole AG-UI). Le serveur ne garde rien entre deux runs.
-- **Interrupt** — la pause d'un run quand l'agent attend une décision humaine (ici,
-  l'approbation du plan de recherche).
-- **Carte de décision** (`Agent:DecisionList`) — composant Twig affiché dans la réponse.
-  L'agent ne fournit que des ids et une phrase de pertinence ; le serveur charge le reste
-  depuis Judilibre.
+  (protocole AG-UI). Le dossier est enregistré à la fin de chaque run.
+- **Interrupt** — la pause d'un run quand l'agent attend une décision humaine : un
+  formulaire de questions, le plan, le choix après les principes.

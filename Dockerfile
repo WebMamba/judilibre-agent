@@ -4,7 +4,7 @@ FROM dunglas/frankenphp:1-php8.5-trixie
 
 WORKDIR /app
 
-RUN install-php-extensions apcu intl opcache zip
+RUN install-php-extensions apcu intl opcache pdo_sqlite zip
 
 COPY docker/php.ini $PHP_INI_DIR/conf.d/zz-app.ini
 COPY docker/Caddyfile /etc/frankenphp/Caddyfile
@@ -25,4 +25,5 @@ RUN composer dump-autoload --classmap-authoritative --no-dev \
     && php bin/console tailwind:build --minify \
     && php bin/console asset-map:compile \
     && php bin/console cache:clear \
+    && mkdir -p var/data \
     && chown -R www-data:www-data var

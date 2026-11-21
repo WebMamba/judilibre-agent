@@ -1,34 +1,30 @@
 ---
 status: accepted
-date: 2026-11-16
+date: 2026-11-21
+supersedes: la version du 2026-11-16 (plan de requêtes)
 ---
 
-# L'utilisateur approuve le plan de recherche
+# L'utilisateur valide la fiche dossier et les axes de recherche
 
 ## Contexte
 
-On veut un humain dans la boucle avant que l'agent interroge Judilibre, sans lui faire
-valider chacune des trois à six recherches d'une question.
+On veut un humain dans la boucle avant toute recherche, dans des termes qu'un avocat
+manipule : des axes de recherche, pas des requêtes Judilibre.
 
 ## Décisions
 
-- **`propose_search_plan` est un `ResumableTool`.** Il reçoit les recherches prévues
-  (requête, opérateur, champs, et le but de chacune) et renvoie un `Interrupt` affiché par
-  le composant `Agent:SearchPlan`, avec trois choix :
-  - **Lancer** : le plan est approuvé et enregistré dans `ResearchState.plan`.
-  - **Modifier** : l'utilisateur écrit une consigne. Le plan est refusé avec cette
-    consigne, et l'agent en propose un nouveau.
-  - **Non** : le plan est refusé, et l'agent ne cherche pas.
-- **`search_decisions` refuse de chercher sans plan approuvé**, et le dit au modèle.
-  L'approbation porte sur la démarche : une fois le plan approuvé, l'agent peut affiner
-  ses requêtes dans ce cadre sans redemander. Pour une nouvelle question, il propose un
-  nouveau plan, qui remplace l'ancien.
-- La consigne de « Modifier » est saisie dans le composant. Un petit contrôleur Stimulus
-  l'envoie comme payload de reprise, `{approved: false, feedback: "…"}`.
+- **`propose_research_plan` est un `ResumableTool`** : il propose le nom du dossier, la
+  **fiche dossier** anonymisée (faits, question de droit, partie défendue, objectif) et
+  1 à 6 **axes** (intitulé, objectif). Le composant `Agent:ResearchPlan` permet de
+  corriger la fiche, d'ajouter, supprimer ou renommer des axes, puis de valider ; ou de
+  demander un autre plan avec une consigne.
+- **Le plan validé est une liste d'`Axis`**, numérotés `a1`, `a2`… et rattachés à un
+  tour. L'agent formule ses requêtes au moment de `search_axis`.
+- **Poursuivre la recherche** passe par le même tool : en phase Sélection, il propose
+  des axes complémentaires (tour suivant), la fiche du premier tour restant acquise.
 
 ## Conséquences
 
-- C'est une barrière de consentement, pas une liste blanche de requêtes : l'agent peut
-  formuler des requêtes qui ne figurent pas mot pour mot dans le plan.
-- L'id de l'interrupt est signé par le SDK : le client ne peut ni approuver un plan que
-  le modèle n'a pas proposé, ni en changer le contenu.
+- C'est une barrière de consentement sur la démarche, pas une liste blanche de requêtes.
+- L'id de l'interrupt est signé par le SDK : le client ne peut pas valider un plan que
+  le modèle n'a pas proposé.
