@@ -2,7 +2,7 @@
 
 {% block title %}{{ dossier and dossier.title ? dossier.title ~ ' · ' : '' }}{{ 'app.title'|trans }}{% endblock %}
 
-{% block body_class %}h-full flex flex-col{% endblock %}
+{% block body_class %}h-full flex flex-col overflow-clip{% endblock %}
 
 {% block body %}
 {# One root for the chat, the document and the side panels: the buttons of the agent's

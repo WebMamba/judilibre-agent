@@ -99,3 +99,7 @@ body {
 .consultation blockquote { @apply border-l-2 border-indigo-300 pl-3 italic text-slate-600 dark:text-slate-400; }
 .consultation footer { @apply mt-8 border-t border-slate-200 pt-3 text-center font-sans text-[11px] italic text-slate-500 dark:border-slate-700 dark:text-slate-400; }
 .grow-input { field-sizing: content; resize: none; min-height: 2.1rem; }
+
+/* The workspace fits the window: only its panels scroll, never the page, even when a
+   scrollIntoView or a growing component would push it. */
+html:has(> body.overflow-clip) { overflow: clip; }

@@ -72,11 +72,11 @@ async (page) => {
     });
 
     const p = await context.newPage();
+    const t0 = Date.now();
+    const marks = [];
+    const mark = (id) => marks.push({ id, t: (Date.now() - t0) / 1000 });
     let failure = null;
     try {
-        const t0 = Date.now();
-        const marks = [];
-        const mark = (id) => marks.push({ id, t: (Date.now() - t0) / 1000 });
         const pause = (ms) => p.waitForTimeout(ms);
         let mouse = { x: W / 2, y: H / 2 };
         const moveTo = async (locator) => {
