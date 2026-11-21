@@ -1,0 +1,57 @@
+{# The Document view. The research controller answers the undo and resume buttons. #}
+<section {{ attributes.defaults({class: 'panel flex min-h-0 flex-col !p-0'}) }}>
+    {% set document = this.document %}
+    <div class="flex items-center justify-between gap-2 border-b border-slate-200 px-5 py-3 dark:border-slate-800">
+        <div>
+            <h2 class="panel-title">{{ 'document.title'|trans }}</h2>
+            {% if document and document.stale %}
+                <p class="mt-0.5 text-[11px] text-amber-700 dark:text-amber-400">{{ 'document.stale'|trans }}</p>
+            {% elseif document and not document.complete %}
+                <p class="mt-0.5 text-[11px] text-indigo-600 dark:text-indigo-400">{{ 'document.writing'|trans }}</p>
+            {% endif %}
+        </div>
+        {% if document and document.complete %}
+            <div class="flex items-center gap-2">
+                {% if phase == 'livre' %}
+                    <button type="button" data-action="research#resumeResearch"
+                            class="rounded-lg border border-slate-300 px-3 py-1.5 text-xs text-slate-700 hover:bg-slate-50 dark:border-slate-700 dark:text-slate-200 dark:hover:bg-slate-800">
+                        🔁 {{ 'document.resume_research'|trans }}
+                    </button>
+                {% endif %}
+                <a href="{{ path('dossier_docx', {id: dossierId}) }}"
+                   class="rounded-lg bg-indigo-600 px-3 py-1.5 text-xs font-medium text-white hover:bg-indigo-500">⬇︎ {{ 'document.export'|trans }}</a>
+            </div>
+        {% endif %}
+    </div>
+
+    <div class="flex-1 overflow-y-auto px-6 py-5">
+        {% if document %}
+            <article class="consultation">
+                <h1>{{ 'document.heading'|trans }}</h1>
+                {% for section in document.sections %}
+                    <section class="group" id="section-{{ section.key }}">
+                        <div class="flex items-baseline justify-between gap-2">
+                            <h2>{{ loop.index }}. {{ section.title }}</h2>
+                            {% if section.undoable %}
+                                <button type="button" data-action="research#undoSection" data-research-key-param="{{ section.key }}"
+                                        class="text-[11px] text-slate-400 opacity-0 hover:text-indigo-600 group-hover:opacity-100">↶ {{ 'document.undo'|trans }}</button>
+                            {% endif %}
+                        </div>
+                        {{ section.html|raw }}
+                    </section>
+                {% endfor %}
+                {% if document.annex is not empty %}
+                    <section>
+                        <h2>{{ 'document.annex'|trans }}</h2>
+                        <ul>
+                            {% for decision in document.annex %}
+                                <li><a href="{{ decision.url }}" target="_blank" rel="noopener noreferrer">{{ decision.citation }}</a></li>
+                            {% endfor %}
+                        </ul>
+                    </section>
+                {% endif %}
+                <footer>{{ this.footer }}</footer>
+            </article>
+        {% endif %}
+    </div>
+</section>

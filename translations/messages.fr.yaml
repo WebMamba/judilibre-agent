@@ -1,17 +1,71 @@
 plan:
-    title: Plan de recherche
-    approve: Lancer
-    edit: Modifier
-    decline: Non
-    fields: 'champs :'
+    title: Fiche dossier et plan de recherche
+    complementary_title: Axes de recherche complémentaires
+    previous_axes: "Déjà cherché :"
+    axes: Axes de recherche
+    objective: "Objectif de l'axe (facultatif)"
+    new_axis: Intitulé du nouvel axe
+    add_axis: Ajouter un axe
+    remove_axis: Supprimer cet axe
+    approve: Valider et lancer la recherche
+    edit: Demander un autre plan
     instruction_placeholder: "Ex. : cherche aussi du côté de la chambre commerciale"
     send_instruction: Envoyer la consigne
-    operator:
-        and: tous les termes
-        or: l'un des termes
-        exact: expression exacte
+brief:
+    title: Fiche dossier
+    facts: Faits (anonymisés)
+    issue: Question de droit
+    side: Partie défendue
+    goal: Objectif du client
+    empty: "La fiche apparaîtra quand l'assistant aura compris votre dossier."
+questions:
+    title:
+        qualification: Quelques questions pour comprendre votre dossier
+        cadrage: Avant de rédiger la consultation
+    comment: Une précision ? (facultatif)
+    submit: Répondre
+findings:
+    title: "Jurisprudence trouvée — tour %round%"
+    help: "Retenez les principes et épinglez les décisions qui vous intéressent, écartez celles qui ne servent pas, puis choisissez la suite."
+    pin_principle: Retenir
+    instruction_placeholder: "Facultatif : ce que vous voulez creuser, ou une consigne pour la rédaction"
+    continue: Continuer la recherche
+    write: Rédiger la consultation
+phase:
+    label: Avancement du dossier
+    qualification: Qualification
+    plan: Plan
+    recherche: Recherche
+    selection: Sélection
+    cadrage: Cadrage
+    redaction: Rédaction
+    livre: Livré
+document:
+    title: Consultation
+    heading: Consultation juridique
+    writing: Rédaction en cours…
+    stale: "La recherche a repris : la consultation sera mise à jour."
+    export: Exporter en Word
+    resume_research: Reprendre la recherche
+    undo: Annuler la retouche
+    annex: Annexe — Décisions citées
+dossiers:
+    title: Mes dossiers
+    intro: "Chaque dossier mène de votre problème à une consultation juridique, appuyée sur la jurisprudence de Judilibre."
+    new: Nouveau dossier
+    untitled: Nouveau dossier
+    updated: mis à jour le
+    rename: Renommer
+    save: Enregistrer
+    empty: "Aucun dossier pour l'instant. Créez-en un et décrivez votre problème."
+    how:
+        qualification: { title: Qualification, text: "Vous exposez le problème ; l'assistant vous pose ses questions." }
+        plan: { title: Plan, text: "Vous validez la fiche dossier et les axes de recherche." }
+        recherche: { title: Recherche, text: "Judilibre est interrogé, Jev trie, vous épinglez la jurisprudence utile." }
+        redaction: { title: Consultation, text: "L'assistant rédige la consultation, à exporter en Word." }
 decision:
     pin: Épingler
+    exclude: Écarter
     summary: Sommaire
     unpublished: Inédit
     missing: "Décision %id% introuvable dans Judilibre."
@@ -28,19 +82,18 @@ filters:
     taxonomy_unavailable: Liste indisponible (Judilibre ne répond pas).
 dossier:
     title: Dossier
-    empty: "Épinglez des décisions depuis leurs cartes 📌, ou demandez-le à l'assistant."
+    empty: "Épinglez des décisions depuis les résultats 📌 : la consultation devra les discuter."
     unpin: Retirer du dossier
 app:
-    title: Recherche de jurisprudence
-    subtitle: "Un assistant qui cherche pour vous dans Judilibre, l'open data des décisions de justice."
-    new_search: Nouvelle recherche
+    title: Judilibre Agent
+    subtitle: "De votre problème à une consultation juridique, appuyée sur la jurisprudence de Judilibre."
 chat:
-    welcome: Quelle question de droit voulez-vous éclairer par la jurisprudence ?
-    suggestion: "Ex. : « Un employeur peut-il licencier un salarié en arrêt maladie prolongé ? »"
-    placeholder: Votre question…
-    waiting: Répondez au plan de recherche ci-dessus…
+    welcome: Exposez votre problème juridique.
+    suggestion: "Ex. : « Mon client, salarié, a été licencié pendant un arrêt maladie de huit mois au motif que son absence désorganisait l'entreprise. Peut-il contester ? »"
+    placeholder: Votre message…
+    waiting: Répondez au formulaire de l'assistant ci-dessus…
     send: Envoyer
-    disclaimer: "Aide à la recherche, pas une consultation juridique. Vérifiez toujours les décisions citées."
+    disclaimer: "Aide à la décision générée par IA : vérifiez toujours les décisions citées."
 login:
     title: Connexion
     intro: Accès réservé. Connectez-vous avec votre e-mail.

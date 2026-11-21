@@ -51,6 +51,36 @@ final readonly class JudilibreClient
      *
      * @return array<string, mixed>
      */
+    /**
+     * Several decisions at once: the requests run together, a few at a time. A decision
+     * Judilibre fails to give is left out.
+     *
+     * @param list<string> $ids
+     *
+     * @return array<string, array<string, mixed>> id => decision
+     */
+    public function decisions(array $ids, int $concurrency = 8): array
+    {
+        $decisions = [];
+        foreach (array_chunk(array_values(array_unique($ids)), max(1, $concurrency)) as $chunk) {
+            $responses = [];
+            foreach ($chunk as $id) {
+                $responses[$id] = $this->judilibreClient->request('GET', 'decision?'.self::queryString(['id' => $id, 'resolve_references' => true]));
+            }
+            foreach ($responses as $id => $response) {
+                try {
+                    if ($response->getStatusCode() < 400) {
+                        $decisions[$id] = $response->toArray();
+                    }
+                } catch (ExceptionInterface) {
+                    // Left out: the caller does without this one.
+                }
+            }
+        }
+
+        return $decisions;
+    }
+
     public function taxonomy(string $id, ?string $jurisdiction = null): array
     {
         return $this->get('taxonomy', ['id' => $id, 'context_value' => $jurisdiction]);

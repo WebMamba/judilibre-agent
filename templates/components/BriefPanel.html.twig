@@ -1,0 +1,29 @@
+{# The case brief and the plan's axes, as validated. #}
+<section {{ attributes.defaults({class: 'panel'}) }}>
+    <h2 class="panel-title">{{ 'brief.title'|trans }}</h2>
+    {% if brief %}
+        <dl class="mt-2 space-y-2 text-xs">
+            {% for field in ['facts', 'issue', 'side', 'goal'] %}
+                {% if brief[field] ?? '' %}
+                    <div>
+                        <dt class="panel-label">{{ ('brief.' ~ field)|trans }}</dt>
+                        <dd class="text-slate-700 dark:text-slate-300">{{ brief[field] }}</dd>
+                    </div>
+                {% endif %}
+            {% endfor %}
+        </dl>
+        {% if axes is not empty %}
+            <div class="panel-label mt-3">{{ 'plan.axes'|trans }}</div>
+            <ul class="space-y-1 text-xs">
+                {% for axis in axes %}
+                    <li class="flex gap-1.5 text-slate-700 dark:text-slate-300">
+                        <span class="shrink-0">{{ (axis.searched ?? false) ? '✓' : '○' }}</span>
+                        <span><span class="text-slate-400">{{ axis.id }}</span> {{ axis.title }}</span>
+                    </li>
+                {% endfor %}
+            </ul>
+        {% endif %}
+    {% else %}
+        <p class="mt-2 text-xs text-slate-500 dark:text-slate-400">{{ 'brief.empty'|trans }}</p>
+    {% endif %}
+</section>

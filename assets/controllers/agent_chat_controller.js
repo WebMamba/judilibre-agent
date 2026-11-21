@@ -15,13 +15,16 @@ import DOMPurify from 'dompurify';
  */
 export default class extends Controller {
     static targets = ['messages', 'input', 'submit', 'placeholder', 'userTemplate', 'assistantTemplate'];
-    static values = { waiting: String };
+    static values = { waiting: String, interrupted: Boolean };
 
     connect() {
         this.texts = new Map();     // messageId → { el, markdown, frame }
         this.toolCalls = new Map(); // toolCallId → { line, label, name, args }
-        this.waiting = false;
+        // A reopened dossier may wait on a form of the agent: answer it first.
+        this.waiting = this.interruptedValue;
         this.defaultPlaceholder = this.inputTarget.placeholder;
+        this.setBusy(false);
+        this.scrollToBottom();
     }
 
     /** Enter without Shift submits; Shift+Enter inserts a newline. */
@@ -40,10 +43,12 @@ export default class extends Controller {
         this.turn = this.appendAssistantTurn();
     }
 
-    /** A button of an interrupt's component: lock its buttons, show the choice. */
+    /** A button answering an interrupt: lock the answering controls, show the choice. */
     chose(event) {
-        event.currentTarget.closest('[data-ag-ui-interrupt-id], [data-interrupt]')?.querySelectorAll('button, textarea').forEach((el) => { el.disabled = true; });
-        event.currentTarget.classList.add('ring-2', 'ring-offset-2', 'ring-amber-400');
+        const component = event.currentTarget.closest('[data-ag-ui-interrupt-id], [data-interrupt]');
+        // The fields and the answering buttons; pin and exclude buttons stay usable.
+        component?.querySelectorAll('input, textarea, [data-interrupt-control] button, button[data-interrupt-control]').forEach((el) => { el.disabled = true; });
+        event.currentTarget.classList.add('ring-2', 'ring-offset-2', 'ring-indigo-400');
     }
 
     // — Lifecycle —
@@ -134,7 +139,7 @@ export default class extends Controller {
         if (!call) return;
         call.label.textContent = this.constructor.describe(call.name, this.constructor.parse(call.args));
         // A component is on its way: the line keeps pulsing until it takes its place.
-        if (!call.name.startsWith('render_') && call.name !== 'propose_search_plan') call.dot.classList.remove('animate-pulse');
+        if (!this.constructor.COMPONENT_TOOLS.includes(call.name)) call.dot.classList.remove('animate-pulse');
     }
 
     toolCallResult({ detail: { toolCallId, content } }) {
@@ -148,17 +153,23 @@ export default class extends Controller {
         this.scrollToBottom();
     }
 
+    /** The tools whose result is a component: their line pulses until it arrives. */
+    static COMPONENT_TOOLS = ['ask_questions', 'propose_research_plan', 'present_findings'];
+
     /** What a call does, in words: its line in the conversation. */
     static describe(name, args) {
         switch (name) {
-            case 'search_decisions': return `🔎 Recherche${args.query ? ` « ${args.query} »` : '…'}${args.page ? ` (page ${args.page + 1})` : ''}`;
+            case 'ask_questions': return '❓ Préparation des questions…';
+            case 'propose_research_plan': return '📝 Préparation de la fiche dossier et du plan…';
+            case 'search_axis': {
+                const queries = (args.queries ?? []).map((q) => `« ${q.query} »`).join(', ');
+                return `🔎 Recherche ${args.axisId ? `de l'axe ${args.axisId}` : '…'}${queries ? ` : ${queries}` : ''} — tri par Jev`;
+            }
             case 'read_decision': return '📄 Lecture d\'une décision';
+            case 'present_findings': return '⚖️ Préparation des principes et des décisions…';
+            case 'write_section': return `✍️ Rédaction${args.section ? ` de la section « ${args.section} »` : '…'}`;
             case 'list_taxonomy': return '📚 Consultation des listes Judilibre';
             case 'set_filters': return '🎚️ Mise à jour des filtres';
-            case 'propose_search_plan': return '📝 Préparation du plan de recherche…';
-            case 'render_decision_list': return '🗂️ Préparation des décisions…';
-            case 'pin_decision': return '📌 Ajout au dossier';
-            case 'unpin_decision': return '📌 Retrait du dossier';
             default: return `⚙️ ${name}`;
         }
     }
@@ -166,12 +177,12 @@ export default class extends Controller {
     /** What came of it, from the tool result the model read. */
     static outcome(name, content) {
         const result = this.parse(content);
-        if (name === 'search_decisions') {
-            if (typeof result.total === 'number') return `${result.total.toLocaleString('fr-FR')} décision${result.total > 1 ? 's' : ''}`;
-            return String(content).slice(0, 140);
+        if (name === 'search_axis') {
+            if (Array.isArray(result.retained)) return `${result.retained.length} décision${result.retained.length > 1 ? 's' : ''} retenue${result.retained.length > 1 ? 's' : ''} sur ${result.candidates ?? 0}`;
+            return String(content).slice(0, 160);
         }
         if (name === 'read_decision') return result.citation ?? String(content).slice(0, 140);
-        if (['set_filters', 'pin_decision', 'unpin_decision'].includes(name)) return String(content).split('\n')[0];
+        if (['set_filters', 'write_section'].includes(name)) return String(content).split('\n')[0];
         return null;
     }
 
