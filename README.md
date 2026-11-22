@@ -46,6 +46,11 @@ For example, for a legal opinion ahead of a hearing:
 Built with Symfony
 ------------------
 
+With Symfony, an AI agent is not limited to a chatbot. The same framework that runs the
+agent also renders the interface, persists the dossier and secures access, so the agent
+can live inside a real application: dynamic, stateful, and intelligent, where every
+screen can be shaped by the AI and every click from the lawyer feeds back into it.
+
  * **[Symfony AI](https://symfony.com/doc/current/ai/index.html)** — several models work
    together behind a single abstraction: Claude Opus 5.5 reasons and writes, Jev 1.14
    sorts the decisions. Every tool of the agent is a plain PHP class (`#[AsTool]`).
