@@ -31,14 +31,18 @@ export default class extends Controller {
 
     /** ag-ui:run-started — the dossier exists from its first run on: show its URL. */
     runStarted() {
+        this.ran = true;
         if (window.location.pathname !== this.urlValue) window.history.replaceState({}, '', this.urlValue);
     }
 
     /**
      * ag-ui:idle — the run is over: read the saved state, which holds what a tool that
-     * interrupted the run changed (no STATE_DELTA carries it).
+     * interrupted the run changed (no STATE_DELTA carries it). Only after a run that
+     * started: a refused one changed nothing, and a new dossier is not saved yet (404).
      */
     async runEnded() {
+        if (!this.ran) return;
+        this.ran = false;
         try {
             const response = await fetch(`${this.urlValue}/state`, { headers: { Accept: 'application/json' } });
             if (!response.ok) return;
