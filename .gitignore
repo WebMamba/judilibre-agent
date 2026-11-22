@@ -20,3 +20,4 @@
 ###< symfony/asset-mapper ###
 
 /.playwright-mcp/
+/demo/output/

@@ -1,0 +1,14 @@
+[
+    {"id": "title", "text": "Judilibre Agent. De votre problème juridique à une consultation prête à plaider, appuyée sur la jurisprudence de la Cour de cassation."},
+    {"id": "problem", "text": "Préparer une plaidoirie, ce sont des heures de recherche : trouver les bons arrêts parmi des milliers, les trier, puis rédiger. Judilibre Agent fait ce travail avec l'avocat, étape par étape, sans jamais lui retirer la main."},
+    {"id": "start", "text": "L'avocat ouvre un dossier, et expose simplement le problème de son client : un salarié licencié après huit mois d'arrêt maladie."},
+    {"id": "questions", "text": "Avant de chercher, l'agent qualifie le dossier. Il pose ses questions dans un formulaire : la partie défendue, la procédure, les faits décisifs."},
+    {"id": "plan", "text": "Il propose ensuite une fiche dossier anonymisée, et un plan de recherche. L'avocat garde la main : il relit la fiche, ajoute un axe, puis valide."},
+    {"id": "search", "text": "La recherche commence. Pour chaque axe, l'agent interroge Judilibre, l'open data de la Cour de cassation. Des centaines de décisions remontent : Jev, un modèle de classification, les trie en quelques secondes, et ne garde que celles utiles au dossier, favorables ou défavorables."},
+    {"id": "findings", "text": "L'agent lit les arrêts les plus forts, puis présente la jurisprudence : des principes, chacun appuyé sur ses arrêts, regroupés par axe. L'avocat retient un principe, épingle les décisions qui comptent, et écarte celles qui ne servent pas."},
+    {"id": "cadrage", "text": "Il peut relancer la recherche, ou passer à la rédaction. Quelques questions de cadrage lèvent alors les dernières ambiguïtés : pour qui écrire, avec quel niveau de détail, quels arguments mettre en avant."},
+    {"id": "redaction", "text": "La consultation s'écrit sous ses yeux, section par section. Chaque citation est vérifiée par le serveur : seules les décisions trouvées dans Judilibre peuvent être citées, et chaque arrêt épinglé doit être discuté."},
+    {"id": "document", "text": "Le document est prêt : citations exactes et cliquables, annexe des décisions, export Word en un clic. Le dossier est sauvegardé : l'avocat peut y revenir, demander une retouche, ou reprendre la recherche."},
+    {"id": "stack", "text": "Sous le capot : Symfony et Symfony AI, le protocole AG-UI pour l'interface agentique, Claude Opus pour le raisonnement, Jev pour le tri, et l'API Judilibre."},
+    {"id": "end", "text": "Judilibre Agent. La jurisprudence, triée, comprise, et prête à plaider."}
+]

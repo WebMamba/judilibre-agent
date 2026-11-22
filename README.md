@@ -1,30 +1,39 @@
-Recherche de jurisprudence
-==========================
+Judilibre Agent
+===============
 
-Un assistant qui retrouve des décisions de justice françaises dans
-[Judilibre](https://www.courdecassation.fr/acces-rapide-judilibre), l'open data de la
-Cour de cassation. On lui pose une question de droit ; il propose un plan de recherche,
-que l'utilisateur approuve, interroge Judilibre, lit les décisions et répond par une
-synthèse et des cartes de décisions à épingler dans un dossier.
+Un agent qui prépare, avec l'avocat, une consultation juridique en vue d'une plaidoirie,
+appuyée sur [Judilibre](https://www.courdecassation.fr/acces-rapide-judilibre), l'open
+data de la Cour de cassation :
+
+ 1. **Qualification** — l'avocat expose le problème ; l'agent pose ses questions dans
+    un formulaire (contexte, problème, partie défendue).
+ 2. **Plan** — l'agent propose une fiche dossier anonymisée et des axes de recherche ;
+    l'avocat les corrige, ajoute ou supprime des axes, et valide.
+ 3. **Recherche** — pour chaque axe, l'agent interroge Judilibre ; **Jev** (TypeSafe AI)
+    trie les centaines de décisions trouvées et ne garde que les utiles.
+ 4. **Sélection** — l'agent présente les principes et leurs arrêts ; l'avocat épingle,
+    écarte, puis poursuit la recherche ou passe à la rédaction.
+ 5. **Cadrage et rédaction** — quelques questions, puis la consultation s'écrit section
+    par section, chaque citation vérifiée par le serveur ; export Word.
 
 Construit avec [Symfony AI](https://symfony.com/doc/current/ai/index.html),
 [Symfony UX](https://ux.symfony.com) et le protocole [AG-UI](https://docs.ag-ui.com)
 ([AG-UI for PHP](https://github.com/WebMamba/ag-ui-php)), sur le modèle de
-[demo-ag-ui](https://github.com/WebMamba/demo-ag-ui). Modèle : Claude Opus 5.5.
+[demo-ag-ui](https://github.com/WebMamba/demo-ag-ui). Modèles : Claude Opus 5.5 (l'agent) et Jev 1.14 (le tri).
 
 > [!WARNING]
-> Une aide à la recherche, pas une consultation juridique : vérifiez toujours les
-> décisions citées.
+> Une aide à la décision générée par IA : vérifiez toujours les décisions citées.
 
 Prérequis
 ---------
 
  * PHP 8.4 ou plus, [Composer](https://getcomposer.org) et la [Symfony CLI](https://symfony.com/download)
  * Une [clé d'API Anthropic](https://console.anthropic.com/settings/keys)
+ * Une [clé d'API TypeSafe](https://console.typesafe.ai/keys), pour Jev
  * Une clé d'API Judilibre : créez une application sur [PISTE](https://piste.gouv.fr),
    abonnez-la à l'API Judilibre, et récupérez sa clé (en-tête `KeyId`)
 
-Ni base de données, ni Node.js, ni Docker.
+Ni serveur de base de données (SQLite), ni Node.js, ni Docker.
 
 Installation
 ------------
@@ -33,12 +42,14 @@ Installation
 composer install
 php bin/console importmap:install
 php bin/console tailwind:build
+php bin/console doctrine:migrations:migrate
 ```
 
 Les clés vont dans `.env.local`, jamais commité :
 
 ```dotenv
 ANTHROPIC_API_KEY=sk-ant-...
+TYPESAFE_API_KEY=...
 APP_USERS='{"vous@example.fr":"<hachage>"}'   # php bin/console security:hash-password
 JUDILIBRE_KEY_ID=...   # la clé d'API PISTE, pas un identifiant OAuth
 # Production par défaut ; une clé du bac à sable va avec :
@@ -60,11 +71,14 @@ php bin/console tailwind:build --watch   # pendant que vous modifiez templates o
 Comment ça marche
 -----------------
 
- * L'agent et son prompt : `config/packages/ai.yaml`. Ses tools : `src/Ai/Tool`. Les
-   composants qu'il affiche : `src/Twig/Components/Agent`.
- * L'état partagé (filtres, plan approuvé, dossier) : `src/Research/ResearchState.php`,
-   affiché par les Live Components `FiltersPanel` et `DossierPanel`, et gardé dans le
-   localStorage du navigateur par `assets/controllers/research_controller.js`.
+ * L'agent et son prompt : `config/packages/ai.yaml`. Ses tools : `src/Ai/Tool`, gardés
+   par phase (`PhaseGuard`). Les composants qu'il affiche : `src/Twig/Components/Agent`.
+ * Le tri par Jev : `src/Triage/JevTriage.php`, appelé par `search_axis`.
+ * L'état du dossier : `src/Research/ResearchState.php`, enregistré avec sa conversation
+   dans l'entité `Dossier` (`src/Dossier/DossierRuns.php`), affiché par les Live
+   Components (frise, fiche, consultation, dossier, filtres).
+ * La consultation : `src/Dossier/ConsultationRenderer.php` (vue Document) et
+   `ConsultationExporter.php` (Word).
  * Le vocabulaire : [CONTEXT.md](CONTEXT.md) ; les décisions : [docs/adr](docs/adr).
 
 Déploiement
@@ -95,4 +109,15 @@ php bin/phpunit
 ```
 
 Ni réseau, ni clé : Judilibre répond depuis `tests/Fixtures/judilibre`, et le modèle est
-remplacé par une plateforme scriptée (`tests/Support`).
+remplacé par une plateforme scriptée, et Jev par un tri factice (`tests/Support`).
+
+Vidéo de présentation
+---------------------
+
+`demo/` enregistre un vrai dossier dans le navigateur (`record.js`, via Playwright), puis
+monte la vidéo avec la voix off (`say`) et les sous-titres, sans ffmpeg système :
+
+```bash
+python3 demo/assemble.py demo/output/raw/<video>.webm demo/output/marks.json
+xcrun swiftc -O demo/assemble.swift -o demo/output/assemble && demo/output/assemble demo/output/spec.json
+```

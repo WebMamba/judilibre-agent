@@ -8,32 +8,74 @@ use AgUi\Bridge\SymfonyAi\AgUi;
 use AgUi\Bridge\SymfonyAi\Exception\InvalidStateException;
 use AgUi\Bundle\Http\AgUiResponse;
 use AgUi\Run\RunAgentInput;
+use App\Dossier\DossierRuns;
+use App\Entity\Dossier;
+use App\Repository\DossierRepository;
 use App\Research\ResearchState;
 use Symfony\AI\Agent\AgentInterface;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
+use Symfony\Component\HttpKernel\Exception\ConflictHttpException;
 use Symfony\Component\HttpKernel\Exception\UnprocessableEntityHttpException;
+use Symfony\Component\Lock\LockFactory;
 use Symfony\Component\Routing\Attribute\Route;
 
 /**
- * The AG-UI endpoint: a RunAgentInput in, the researcher's event stream out, with the
- * research state (filters, approved plan, dossier) as the shared state. The model and
- * its options are in config/packages/ai.yaml.
+ * The AG-UI endpoint: a RunAgentInput in, the researcher's event stream out. The thread
+ * is the dossier: born with its first message, owned by its user, run once at a time,
+ * and saved after every run (ADR 0002). The model and its options are in
+ * config/packages/ai.yaml.
  */
-final readonly class StreamController
+final class StreamController extends AbstractController
 {
+    /** Long enough for the longest run: searches, triage, a consultation. */
+    private const float LOCK_TTL = 900.0;
+
     #[Route('/agent/stream', name: 'agent_stream', methods: ['POST'])]
-    public function __invoke(Request $request, RunAgentInput $input, AgentInterface $researcher, AgUi $agUi, ResearchState $state): AgUiResponse
-    {
-        // A run streams for a minute or more: release the session lock first, or the
-        // Live Components of the page would wait for the run to end.
+    public function __invoke(
+        Request $request,
+        RunAgentInput $input,
+        AgentInterface $researcher,
+        AgUi $agUi,
+        ResearchState $state,
+        DossierRepository $dossiers,
+        DossierRuns $runs,
+        LockFactory $locks,
+    ): AgUiResponse {
+        $owner = $this->getUser()?->getUserIdentifier() ?? throw new AccessDeniedHttpException();
+        if (1 !== preg_match('/^'.Dossier::ID_PATTERN.'$/', $input->threadId)) {
+            throw new UnprocessableEntityHttpException('The thread id is not a dossier id.');
+        }
+
+        $dossier = $dossiers->find($input->threadId) ?? new Dossier($input->threadId, $owner);
+        if ($dossier->getOwner() !== $owner) {
+            throw new AccessDeniedHttpException('This dossier is not yours.');
+        }
+
+        $lock = $locks->createLock('dossier-'.$dossier->getId(), self::LOCK_TTL);
+        if (!$lock->acquire()) {
+            throw new ConflictHttpException('Un run est déjà en cours sur ce dossier.');
+        }
+
+        // A run streams for minutes: release the session lock first, or the Live
+        // Components of the page would wait for the run to end.
         if ($request->hasSession() && $request->getSession()->isStarted()) {
             $request->getSession()->save();
         }
 
         try {
-            return new AgUiResponse($agUi->run($input, $researcher, state: $state));
+            $events = $agUi->run($runs->prepare($dossier, $input), $researcher, state: $state);
         } catch (InvalidStateException $e) {
+            $lock->release();
+
             throw new UnprocessableEntityHttpException($e->getMessage(), $e);
+        } catch (\Throwable $e) {
+            $lock->release();
+
+            throw $e;
         }
+
+        return new AgUiResponse($runs->record($dossier, $events, $state, $lock));
     }
 }

@@ -53,3 +53,53 @@ body {
 @keyframes blink {
     to { visibility: hidden; }
 }
+
+/* — The agent's forms: questions, plan, principles — */
+.plan-input {
+    @apply w-full rounded-lg border border-slate-200 bg-white px-2 py-1.5 text-sm text-slate-900 focus:border-indigo-400 focus:outline-none disabled:bg-slate-50 disabled:text-slate-500 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100 dark:disabled:bg-slate-800;
+}
+.choice-chip > span {
+    @apply inline-block cursor-pointer rounded-full border border-sky-200 bg-white px-3 py-1 text-xs text-slate-700 dark:border-sky-800 dark:bg-slate-900 dark:text-slate-200;
+}
+.choice-chip > input:checked + span {
+    @apply border-sky-600 bg-sky-600 text-white;
+}
+.choice-chip > input:disabled + span { @apply cursor-default opacity-70; }
+.badge { @apply rounded-full bg-slate-100 px-2 py-0.5 text-slate-700 dark:bg-slate-800 dark:text-slate-300; }
+.badge-indigo { @apply bg-indigo-50 text-indigo-700 dark:bg-indigo-950 dark:text-indigo-300; }
+.stance { @apply shrink-0 rounded-full px-2 py-0.5 text-[11px] font-medium; }
+.stance-favorable { @apply bg-emerald-50 text-emerald-700 dark:bg-emerald-950 dark:text-emerald-300; }
+.stance-defavorable { @apply bg-rose-50 text-rose-700 dark:bg-rose-950 dark:text-rose-300; }
+.stance-contexte { @apply bg-slate-100 text-slate-600 dark:bg-slate-800 dark:text-slate-300; }
+.pin-button, .exclude-button {
+    @apply shrink-0 whitespace-nowrap rounded-lg border border-slate-200 px-2 py-1 text-xs text-slate-600 hover:bg-slate-50 dark:border-slate-700 dark:text-slate-300 dark:hover:bg-slate-800;
+}
+.pin-button.is-on { @apply border-indigo-300 bg-indigo-50 text-indigo-700 dark:border-indigo-700 dark:bg-indigo-950 dark:text-indigo-300; }
+.exclude-button.is-on { @apply border-rose-300 bg-rose-50 text-rose-700 dark:border-rose-800 dark:bg-rose-950 dark:text-rose-300; }
+[data-decision].excluded > div > div:first-child { @apply opacity-40 line-through decoration-slate-400; }
+
+/* An interrupt already answered, in a reopened dossier: its answering controls go. */
+.answered [data-interrupt-control] { display: none; }
+.answered :is(input, textarea) { pointer-events: none; }
+
+/* — The phase stepper — */
+.step { @apply shrink-0 rounded-full px-2 py-0.5 text-slate-400 dark:text-slate-500; }
+.step-done { @apply text-emerald-700 dark:text-emerald-400; }
+.step-current { @apply bg-indigo-600 font-medium text-white dark:bg-indigo-500; }
+
+/* — The consultation, in the Document view — */
+.consultation { @apply mx-auto max-w-3xl font-serif text-[15px] leading-relaxed text-slate-800 dark:text-slate-200; }
+.consultation h1 { @apply mb-4 text-center font-serif text-2xl font-semibold tracking-wide text-slate-900 dark:text-slate-100; }
+.consultation h2 { @apply mt-6 mb-2 border-b border-slate-200 pb-1 font-sans text-sm font-semibold uppercase tracking-[0.12em] text-indigo-900 dark:border-slate-700 dark:text-indigo-200; }
+.consultation h3 { @apply mt-4 mb-1 font-sans text-sm font-semibold text-slate-900 dark:text-slate-100; }
+.consultation p + p, .consultation ul, .consultation ol { @apply mt-2; }
+.consultation ul { @apply list-disc pl-5; }
+.consultation ol { @apply list-decimal pl-5; }
+.consultation a { @apply text-indigo-700 underline decoration-indigo-300 underline-offset-2 dark:text-indigo-300; }
+.consultation blockquote { @apply border-l-2 border-indigo-300 pl-3 italic text-slate-600 dark:text-slate-400; }
+.consultation footer { @apply mt-8 border-t border-slate-200 pt-3 text-center font-sans text-[11px] italic text-slate-500 dark:border-slate-700 dark:text-slate-400; }
+.grow-input { field-sizing: content; resize: none; min-height: 2.1rem; }
+
+/* The workspace fits the window: only its panels scroll, never the page, even when a
+   scrollIntoView or a growing component would push it. */
+html:has(> body.overflow-clip) { overflow: clip; }

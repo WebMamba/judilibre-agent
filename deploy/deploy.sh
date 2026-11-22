@@ -18,6 +18,9 @@ compose=(docker compose --env-file .env.prod.local -f compose.prod.yaml)
 "${compose[@]}" up -d --remove-orphans
 docker image prune -f >/dev/null
 
+# The schema of the dossiers, as the migrations say, as the user the app runs as.
+"${compose[@]}" exec -T app php bin/console doctrine:migrations:migrate --no-interaction --allow-no-migration
+
 # The app answers once it is up (and Caddy has its certificate): the login page.
 server_name=$(grep -E '^SERVER_NAME=' .env.prod.local | cut -d= -f2- | tr -d "'\"")
 for _ in $(seq 1 60); do

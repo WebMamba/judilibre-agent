@@ -1,35 +1,36 @@
 ---
 status: accepted
-date: 2026-11-16
+date: 2026-11-21
+supersedes: la version du 2026-11-16 (état dans le localStorage)
 ---
 
-# L'état de recherche partagé : filtres stricts et dossier
+# Le dossier : un état partagé, persisté côté serveur
 
 ## Contexte
 
-AG-UI permet un état partagé entre l'agent et l'interface. Le SDK n'en prend qu'un
-objet par run.
+AG-UI permet un état partagé entre l'agent et l'interface, un objet par run. Le livrable
+est devenu une consultation juridique, longue et coûteuse à produire : la garder dans le
+navigateur seul ne suffit plus.
 
 ## Décisions
 
-- **Un seul objet, `ResearchState`**, avec trois parties : `filters`, `plan` (le plan
-  approuvé, voir ADR 0003) et `dossier`. Deux Live Components l'affichent : le panneau
-  des filtres et le panneau du dossier. Il implémente `DescribesItself` pour dire au
-  modèle, en clair, les filtres en vigueur et le contenu du dossier.
-- **Les filtres sont une contrainte stricte.** `search_decisions` n'a pas de paramètre de
-  filtre : il applique ceux de l'état. L'agent ne peut les changer qu'avec `set_filters`,
-  et le changement se voit dans le panneau. L'utilisateur peut les modifier dans le
-  panneau, et ses changements partent avec le run suivant.
-- **Le dossier est alimenté des deux côtés** : l'utilisateur épingle depuis une carte de
-  décision, l'agent avec `pin_decision` / `unpin_decision` quand on le lui demande.
-- **L'état survit au rechargement grâce à localStorage** : un contrôleur Stimulus le
-  sauvegarde à chaque `ag-ui:state-changed` et le restaure au chargement de la page. Il
-  n'y a toujours pas de stockage côté serveur.
+- **Un dossier = un thread AG-UI**, l'entité Doctrine `Dossier` (SQLite) : sa
+  conversation, son `ResearchState` et ses interrupts ouverts. Il naît avec son premier
+  message, appartient à son utilisateur (`DossierVoter`), sans partage.
+- **Le serveur fait foi.** Avant chaque run, `DossierRuns` reconstruit l'entrée depuis le
+  dossier : la conversation enregistrée plus les nouveaux messages de l'utilisateur, et
+  l'état enregistré où seule la part de l'utilisateur (`filters`, `dossier`,
+  `pinnedPrinciples`, `excluded`) vient du navigateur. Un client ne peut forger ni un
+  plan validé, ni un résultat de tool, ni une consultation. Après le run, la conversation
+  (le `MESSAGES_SNAPSHOT`), l'état et les interrupts ouverts sont enregistrés.
+- **Un run à la fois par dossier** : un verrou `symfony/lock` ; un second run reçoit 409.
+- **Les filtres restent une contrainte stricte** : `search_axis` les applique toujours.
+- **Le navigateur relit l'état enregistré à la fin de chaque run** : un tool qui
+  interrompt le run change l'état sans `STATE_DELTA`.
 
 ## Conséquences
 
-- Une recherche ne peut pas sortir des filtres à l'insu de l'utilisateur.
-- Le dossier appartient au navigateur : il ne se partage pas entre appareils. Une
-  persistance serveur (Doctrine) pourra le remplacer plus tard.
-- L'état envoyé par le client est validé : un état qui ne correspond pas à la classe
-  donne une 422.
+- Un dossier se reprend d'un appareil à l'autre ; la page rouvre la conversation, ses
+  composants, et l'interrupt en attente.
+- SQLite suffit sur un seul serveur ; il vit dans un volume (`var/data`). Les migrations
+  tournent à chaque déploiement.

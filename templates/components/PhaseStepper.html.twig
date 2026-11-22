@@ -1,0 +1,8 @@
+<nav {{ attributes.defaults({class: 'flex shrink-0 items-center gap-0.5 text-[11px]'}) }} aria-label="{{ 'phase.label'|trans }}">
+    {% for step in this.steps %}
+        {% if not loop.first %}<span class="h-px w-2 shrink-0 bg-slate-300 dark:bg-slate-700"></span>{% endif %}
+        <span class="step step-{{ step.state }}" {% if step.state == 'current' %}aria-current="step"{% endif %}>
+            {% if step.state == 'done' %}✓ {% endif %}{{ step.label }}
+        </span>
+    {% endfor %}
+</nav>
