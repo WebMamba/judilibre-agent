@@ -4,7 +4,7 @@ FROM dunglas/frankenphp:1-php8.5-trixie
 
 WORKDIR /app
 
-RUN install-php-extensions apcu intl opcache pdo_sqlite zip
+RUN install-php-extensions apcu gd intl opcache pdo_sqlite zip
 
 COPY docker/php.ini $PHP_INI_DIR/conf.d/zz-app.ini
 COPY docker/Caddyfile /etc/frankenphp/Caddyfile
