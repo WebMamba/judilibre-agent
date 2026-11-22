@@ -59,7 +59,7 @@ def main(raw: str, marks_file: str) -> None:
     shutil.rmtree(FRAMES, ignore_errors=True)
     FRAMES.mkdir(parents=True)
 
-    spec = {'fps': FPS, 'frames': str(FRAMES), 'segments': [], 'waits': [], 'spots': [], 'output': str(OUT / 'judilibre-agent-demo.mp4')}
+    spec = {'fps': FPS, 'frames': str(FRAMES), 'segments': [], 'waits': [], 'spots': [], 'output': str(OUT / 'cassius-demo.mp4')}
     index = 0
     start = 0.0
     for segment, length, pieces in SEGMENTS:
