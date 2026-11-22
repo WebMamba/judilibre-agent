@@ -4,9 +4,6 @@ Judilibre Agent
 Your legal documents, drafted with AI: formal notices, writs of summons, pleadings, legal
 opinions, petitions.
 
-> [!WARNING]
-> AI-generated decision support: always check the decisions it cites.
-
 For young and independent lawyers
 ----------------------------------
 
@@ -15,13 +12,22 @@ among thousands, sorting them, then writing it all up properly. Big firms have t
 that. A lawyer on their own doesn't. Judilibre Agent does this work with them, at a lower
 cost and much faster.
 
-Not a chatbot: a complete workflow, guided by several AIs
----------------------------------------------------------
+Not a chatbot: an intelligent application
+-----------------------------------------
 
-The lawyer doesn't just talk to an AI. Several AIs guide them from the research to the
-layout of the finished document, and at every step the agent builds the interface the
-lawyer needs: a form, a plan to edit, a list of rulings to sort, a document to review. For
-example, for a legal opinion ahead of a hearing:
+Judilibre Agent is not a chat window with an AI behind it. It is an application that the
+lawyer and the agent use **together**, on the same screen and the same dossier.
+
+ * **The agent drives the interface.** It doesn't only answer with text: it builds what the
+   lawyer needs at each step, a form to fill in, a research plan to edit, rulings to sort,
+   a document to review, and it updates the dossier live as it works.
+ * **The lawyer acts on it directly.** They answer the form, add or remove research axes,
+   pin or discard rulings, edit the filters. Every click changes the shared dossier, and
+   the agent picks up from there.
+ * **Several AIs, one workflow.** Claude Opus reasons and writes, Jev sorts the case law;
+   together they take the lawyer from the client's problem to the finished document.
+
+For example, for a legal opinion ahead of a hearing:
 
  1. **Qualify** — the lawyer describes the client's problem; the agent asks its questions
     in a form (context, problem, party represented). It then proposes an anonymised case
