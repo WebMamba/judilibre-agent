@@ -55,7 +55,7 @@ final class StreamController extends AbstractController
 
         $lock = $locks->createLock('dossier-'.$dossier->getId(), self::LOCK_TTL);
         if (!$lock->acquire()) {
-            throw new ConflictHttpException('Un run est déjà en cours sur ce dossier.');
+            throw new ConflictHttpException('A run is already in progress on this dossier.');
         }
 
         // A run streams for minutes: release the session lock first, or the Live

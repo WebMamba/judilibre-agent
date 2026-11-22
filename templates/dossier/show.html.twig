@@ -18,7 +18,27 @@
      data-research-interrupts-value="{{ interrupts|json_encode }}"
      data-research-url-value="{{ path('dossier_show', {id: id}) }}"
      data-research-token-value="{{ csrf_token('dossier') }}"
+     data-research-labels-value="{{ {
+        busy: 'research.busy'|trans, failed: 'research.failed'|trans,
+        pin: 'decision.pin'|trans, pinned: 'research.pinned'|trans,
+        keep: 'findings.pin_principle'|trans, kept: 'research.principle_pinned'|trans,
+        exclude: 'decision.exclude'|trans, restore: 'research.restore'|trans,
+     }|json_encode }}"
      data-agent-chat-waiting-value="{{ 'chat.waiting'|trans }}"
+     data-agent-chat-labels-value="{{ {
+        ask_questions: 'tool.ask_questions'|trans, propose_research_plan: 'tool.propose_research_plan'|trans,
+        search_axis: 'tool.search_axis'|trans, search_by_jev: 'tool.search_by_jev'|trans,
+        retained_one: 'tool.retained_one'|trans, retained_many: 'tool.retained_many'|trans,
+        read_decision: 'tool.read_decision'|trans, present_findings: 'tool.present_findings'|trans,
+        write_section: 'tool.write_section'|trans, write_section_of: 'tool.write_section_of'|trans,
+        write_done: 'tool.write_done'|trans, write_refused: 'tool.write_refused'|trans,
+        list_taxonomy: 'tool.list_taxonomy'|trans, set_filters: 'tool.set_filters'|trans,
+        sections: {
+            faits: 'consultation.section.faits'|trans, problematique: 'consultation.section.problematique'|trans,
+            reponse: 'consultation.section.reponse'|trans, discussion: 'consultation.section.discussion'|trans,
+            risques: 'consultation.section.risques'|trans, plaidoirie: 'consultation.section.plaidoirie'|trans,
+        },
+     }|json_encode }}"
      data-agent-chat-interrupted-value="{{ interrupts is not empty ? 'true' : 'false' }}"
      data-action="
         ag-ui:connect->research#connected

@@ -46,6 +46,6 @@ final class ConsultationPanel
 
     public function footer(): string
     {
-        return ConsultationRenderer::FOOTER;
+        return $this->renderer->footer();
     }
 }

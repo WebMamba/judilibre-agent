@@ -1,0 +1,42 @@
+# The labels Judilibre returns (in French), in English. Missing ones stay in French.
+Cour de cassation: Court of Cassation
+"Cour d'appel": Court of Appeal
+Tribunal judiciaire: Court of first instance
+Tribunal de commerce: Commercial court
+Assemblée plénière: Plenary Assembly
+Chambre mixte: Mixed Chamber
+Première chambre civile: First Civil Chamber
+Deuxième chambre civile: Second Civil Chamber
+Troisième chambre civile: Third Civil Chamber
+Chambre commerciale financière et économique: Commercial, Financial and Economic Chamber
+Chambre commerciale, financière et économique: Commercial, Financial and Economic Chamber
+Chambre sociale: Social Chamber
+Chambre criminelle: Criminal Chamber
+Chambres réunies: Combined Chambers
+Première présidence (Ordonnance): First Presidency (Order)
+Toutes les chambres civiles: All civil chambers
+Autre: Other
+# Publications, as resolved references
+Publié au Bulletin: Published in the Bulletin
+Publié au Rapport: Published in the Report
+Publié aux Lettres de chambre: Published in the Chamber letters
+Publié aux lettres de chambre: Published in the Chamber letters
+Communiqué: Press release
+Inédit: Unpublished
+# Solutions
+Cassation: Quashed
+Cassation partielle: Partly quashed
+Cassation sans renvoi: Quashed without referral
+Cassation partielle sans renvoi: Partly quashed without referral
+Rejet: Appeal dismissed
+Irrecevabilité: Inadmissible
+Non-lieu à statuer: No need to rule
+Désistement: Withdrawal
+Annulation: Annulled
+Avis: Opinion
+Renvoi: Referral
+Qpc renvoi: Constitutional question referred
+Qpc incidente - renvoi au Conseil constitutionnel: Constitutional question referred
+Qpc incidente - non-lieu à renvoi au Conseil constitutionnel: Constitutional question not referred
+Déchéance: Forfeiture
+Annulation partielle: Partly annulled

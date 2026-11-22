@@ -1,0 +1,10 @@
+[
+    {"id": "start", "step": "Example: a legal opinion", "text": "The lawyer describes the client's problem."},
+    {"id": "questions", "step": "1 · Qualify", "text": "The agent asks its questions in a form."},
+    {"id": "plan", "step": "1 · Qualify", "text": "Case brief and research plan: the lawyer adds an axis, then approves."},
+    {"id": "search", "step": "2 · Search & sort", "text": "The agent queries Judilibre; Jev sorts hundreds of decisions."},
+    {"id": "findings", "step": "3 · Select", "text": "Principles, backed by their rulings. The lawyer pins and discards."},
+    {"id": "cadrage", "step": "4 · Write", "text": "A few framing questions before the writing."},
+    {"id": "redaction", "step": "4 · Write", "text": "Section by section, every citation checked."},
+    {"id": "document", "step": "4 · Write", "text": "The finished document, laid out, exported to Word."}
+]

@@ -8,14 +8,15 @@ import DOMPurify from 'dompurify';
  * WebMamba/demo-ag-ui.
  *
  *  - text        → streamed into the assistant's turn, as sanitized markdown
- *  - tool calls  → a readable line ("🔎 Recherche « … » — 12 décisions"), which is also
+ *  - tool calls  → a readable line ("🔎 Searching axis a1 — 12 decisions kept"), which is also
  *                  the call's activity slot: ag-ui-activities puts the server-rendered
  *                  component (search plan, decision cards) in its place
  *  - interrupts  → the input is locked until the plan is answered
  */
 export default class extends Controller {
     static targets = ['messages', 'input', 'submit', 'placeholder', 'userTemplate', 'assistantTemplate'];
-    static values = { waiting: String, interrupted: Boolean };
+    // labels: the tool lines, in the page's language (templates/dossier/show.html.twig).
+    static values = { waiting: String, interrupted: Boolean, labels: Object };
 
     connect() {
         this.texts = new Map();     // messageId → { el, markdown, frame }
@@ -124,7 +125,7 @@ export default class extends Controller {
         slot.append(line);
 
         const call = { line, dot, label, name: toolCallName, args: '' };
-        label.textContent = this.constructor.describe(call.name, {});
+        label.textContent = this.describe(call.name, {});
         this.toolCalls.set(toolCallId, call);
         this.scrollToBottom();
     }
@@ -137,7 +138,7 @@ export default class extends Controller {
     toolCallEnd({ detail: { toolCallId } }) {
         const call = this.toolCalls.get(toolCallId);
         if (!call) return;
-        call.label.textContent = this.constructor.describe(call.name, this.constructor.parse(call.args));
+        call.label.textContent = this.describe(call.name, this.constructor.parse(call.args));
         // A component is on its way: the line keeps pulsing until it takes its place.
         if (!this.constructor.COMPONENT_TOOLS.includes(call.name)) call.dot.classList.remove('animate-pulse');
     }
@@ -145,7 +146,7 @@ export default class extends Controller {
     toolCallResult({ detail: { toolCallId, content } }) {
         const call = this.toolCalls.get(toolCallId);
         if (!call) return;
-        const outcome = this.constructor.outcome(call.name, content);
+        const outcome = this.outcome(call.name, content);
         if (outcome) call.label.textContent += ` — ${outcome}`;
     }
 
@@ -157,33 +158,37 @@ export default class extends Controller {
     static COMPONENT_TOOLS = ['ask_questions', 'propose_research_plan', 'present_findings'];
 
     /** What a call does, in words: its line in the conversation. */
-    static describe(name, args) {
+    describe(name, args) {
+        const l = this.labelsValue;
         switch (name) {
-            case 'ask_questions': return '❓ Préparation des questions…';
-            case 'propose_research_plan': return '📝 Préparation de la fiche dossier et du plan…';
+            case 'ask_questions':
+            case 'propose_research_plan':
+            case 'read_decision':
+            case 'present_findings':
+            case 'list_taxonomy':
+            case 'set_filters':
+                return l[name];
             case 'search_axis': {
-                const queries = (args.queries ?? []).map((q) => `« ${q.query} »`).join(', ');
-                return `🔎 Recherche ${args.axisId ? `de l'axe ${args.axisId}` : '…'}${queries ? ` : ${queries}` : ''} — tri par Jev`;
+                const queries = (args.queries ?? []).map((q) => `“${q.query}”`).join(', ');
+                return `${l.search_axis.replace('%axis%', args.axisId ?? '…')}${queries ? ` : ${queries}` : ''} — ${l.search_by_jev}`;
             }
-            case 'read_decision': return '📄 Lecture d\'une décision';
-            case 'present_findings': return '⚖️ Préparation des principes et des décisions…';
-            case 'write_section': return `✍️ Rédaction${args.section ? ` de la section « ${args.section} »` : '…'}`;
-            case 'list_taxonomy': return '📚 Consultation des listes Judilibre';
-            case 'set_filters': return '🎚️ Mise à jour des filtres';
+            case 'write_section': return args.section ? l.write_section_of.replace('%section%', l.sections[args.section] ?? args.section) : `${l.write_section}…`;
             default: return `⚙️ ${name}`;
         }
     }
 
     /** What came of it, from the tool result the model read. */
-    static outcome(name, content) {
-        const result = this.parse(content);
+    outcome(name, content) {
+        const l = this.labelsValue;
+        const result = this.constructor.parse(content);
         if (name === 'search_axis') {
-            if (Array.isArray(result.retained)) return `${result.retained.length} décision${result.retained.length > 1 ? 's' : ''} retenue${result.retained.length > 1 ? 's' : ''} sur ${result.candidates ?? 0}`;
-            return String(content).slice(0, 160);
+            if (!Array.isArray(result.retained)) return String(content).slice(0, 160);
+            const count = result.retained.length;
+            return (count > 1 ? l.retained_many : l.retained_one).replace('{count}', count).replace('{candidates}', result.candidates ?? 0);
         }
-        if (name === 'read_decision') return result.citation ?? String(content).slice(0, 140);
-        if (name === 'write_section') return String(content).split(/(?<=\.)\s/)[0];
-        if (name === 'set_filters') return String(content).split('\n')[0];
+        if (name === 'read_decision') return result.citation ?? null;
+        // The result speaks to the model, in French: only its verdict is shown.
+        if (name === 'write_section') return /^Section « .+ » (rédigée|réécrite)\./.test(String(content)) ? l.write_done : l.write_refused;
         return null;
     }
 

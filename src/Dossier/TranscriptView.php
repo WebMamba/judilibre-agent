@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace App\Dossier;
 
+use Symfony\Contracts\Translation\TranslatorInterface;
+
 /**
  * A saved conversation, as the page shows it when a dossier is reopened: the same
  * turns the chat controller builds from the live events. A component the agent
@@ -12,24 +14,13 @@ namespace App\Dossier;
  */
 final class TranscriptView
 {
-    private const array LABELS = [
-        'ask_questions' => '❓ Questions',
-        'propose_research_plan' => '📝 Fiche dossier et plan de recherche',
-        'search_axis' => '🔎 Recherche et tri',
-        'read_decision' => "📄 Lecture d'une décision",
-        'present_findings' => '⚖️ Principes et décisions',
-        'write_section' => '✍️ Rédaction',
-        'set_filters' => '🎚️ Mise à jour des filtres',
-        'list_taxonomy' => '📚 Consultation des listes Judilibre',
-    ];
-
     /**
      * @param list<array<string, mixed>> $messages   the AG-UI messages of the dossier
      * @param list<array<string, mixed>> $interrupts the interrupts still open
      *
      * @return list<array{role: 'user', text: string}|array{role: 'assistant', items: list<array<string, mixed>>}>
      */
-    public static function turns(array $messages, array $interrupts): array
+    public static function turns(array $messages, array $interrupts, TranslatorInterface $translator): array
     {
         $open = array_flip(array_column($interrupts, 'id'));
         $activities = [];
@@ -85,7 +76,8 @@ final class TranscriptView
                     continue;
                 }
                 $name = (string) ($call['function']['name'] ?? '');
-                $current['items'][] = ['type' => 'tool', 'label' => self::label($name, $results[$id] ?? null)];
+                $arguments = json_decode((string) ($call['function']['arguments'] ?? ''), true);
+                $current['items'][] = ['type' => 'tool', 'label' => self::label($translator, $name, \is_array($arguments) ? $arguments : [], $results[$id] ?? null)];
             }
         }
         if (null !== $current) {
@@ -95,21 +87,23 @@ final class TranscriptView
         return $turns;
     }
 
-    private static function label(string $name, ?string $result): string
+    /** @param array<string, mixed> $arguments */
+    private static function label(TranslatorInterface $translator, string $name, array $arguments, ?string $result): string
     {
-        $label = self::LABELS[$name] ?? '⚙️ '.$name;
-        if (null === $result) {
-            return $label;
-        }
-        $decoded = json_decode($result, true);
+        $label = match ($name) {
+            'ask_questions', 'propose_research_plan', 'search_axis', 'present_findings' => $translator->trans('tool.'.$name.'_done'),
+            'read_decision', 'write_section', 'set_filters', 'list_taxonomy' => $translator->trans('tool.'.$name),
+            default => '⚙️ '.$name,
+        };
+        $decoded = null === $result ? null : json_decode($result, true);
         if ('search_axis' === $name && \is_array($decoded) && isset($decoded['axis'])) {
-            return \sprintf('%s — axe %s : %d décision(s) retenue(s) sur %d', $label, $decoded['axis'], \count($decoded['retained'] ?? []), $decoded['candidates'] ?? 0);
+            return \sprintf('%s — %s : %s', $label, $translator->trans('tool.axis', ['%axis%' => $decoded['axis']]), $translator->trans('tool.retained', ['%count%' => \count($decoded['retained'] ?? []), '%candidates%' => $decoded['candidates'] ?? 0]));
         }
         if ('read_decision' === $name && \is_array($decoded) && isset($decoded['citation'])) {
             return $label.' — '.$decoded['citation'];
         }
-        if ('write_section' === $name) {
-            return $label.' — '.(preg_split('/(?<=\.)\s/u', $result)[0] ?? $result);
+        if ('write_section' === $name && \is_string($arguments['section'] ?? null)) {
+            return $translator->trans('tool.write_section_of', ['%section%' => $translator->trans('consultation.section.'.$arguments['section'])]);
         }
 
         return $label;

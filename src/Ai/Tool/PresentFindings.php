@@ -14,8 +14,10 @@ use App\Research\FoundDecision;
 use App\Research\Phase;
 use App\Research\Principle;
 use App\Research\ResearchState;
+use App\Research\SearchFilters;
 use App\Research\Stance;
 use Symfony\AI\Agent\Toolbox\Attribute\AsTool;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 /**
  * Shows the principles of a round of research, by axis, each with its decisions, and
@@ -34,11 +36,10 @@ TXT,
 )]
 final readonly class PresentFindings implements ResumableTool
 {
-    private const array PUBLICATIONS = ['b' => 'Bulletin', 'r' => 'Rapport', 'l' => 'Lettres de chambre', 'c' => 'Communiqué'];
-
     public function __construct(
         private ResearchState $state,
         private ComponentActivityFactory $activities,
+        private TranslatorInterface $translator,
     ) {
     }
 
@@ -146,7 +147,7 @@ final readonly class PresentFindings implements ResumableTool
                 'id' => $principle->id,
                 'statement' => $principle->statement,
                 'stance' => $principle->stance->value,
-                'stanceLabel' => $principle->stance->label(),
+                'stanceLabel' => $this->translator->trans('stance.'.$principle->stance->value),
                 'decisions' => array_map(function (FoundDecision $found): array {
                     $decision = $this->state->retainedDecision($found->id);
 
@@ -155,15 +156,23 @@ final readonly class PresentFindings implements ResumableTool
                         'relevance' => $found->relevance,
                         'citation' => $decision?->citation ?? $found->id,
                         'stance' => $decision?->stance->value ?? 'contexte',
-                        'stanceLabel' => $decision?->stance->label() ?? '',
-                        'solution' => $decision?->solution,
+                        'stanceLabel' => null === $decision ? '' : $this->translator->trans('stance.'.$decision->stance->value),
+                        'solution' => null === $decision?->solution ? null : $this->translator->trans($decision->solution, [], 'judilibre'),
                         'summary' => $decision?->summary,
-                        'publications' => array_map(static fn (string $p): string => self::PUBLICATIONS[$p] ?? $p, $decision->publication ?? []),
+                        'publications' => array_map($this->publication(...), $decision->publication ?? []),
                     ];
                 }, $principle->decisions),
             ];
         }
 
         return array_values($groups);
+    }
+
+    /** A code ("b") or, with resolved references, Judilibre's label ("Publié au Bulletin"). */
+    private function publication(string $publication): string
+    {
+        return \in_array($publication, SearchFilters::PUBLICATIONS, true)
+            ? $this->translator->trans('publication.'.$publication)
+            : $this->translator->trans($publication, [], 'judilibre');
     }
 }

@@ -13,7 +13,8 @@ import { getComponent } from '@symfony/ux-live-component';
  */
 export default class extends Controller {
     static targets = ['document', 'title'];
-    static values = { state: Object, messages: Array, interrupts: Array, url: String, token: String };
+    // labels: the button texts and alerts, in the page's language (templates/dossier/show.html.twig).
+    static values = { state: Object, messages: Array, interrupts: Array, url: String, token: String, labels: Object };
 
     connect() {
         this.state = this.stateValue;
@@ -114,7 +115,7 @@ export default class extends Controller {
             body: new URLSearchParams({ _token: this.tokenValue }),
         });
         if (!response.ok) {
-            window.alert(response.status === 409 ? 'Un run est en cours sur ce dossier : réessayez dans un instant.' : 'Action impossible.');
+            window.alert(response.status === 409 ? this.labelsValue.busy : this.labelsValue.failed);
             return;
         }
         const { state } = await response.json();
@@ -154,14 +155,14 @@ export default class extends Controller {
         const excluded = new Set(this.state.excluded ?? []);
 
         this.element.querySelectorAll('[data-pin-decision]').forEach((button) => {
-            this.mark(button, pinned.has(button.dataset.pinDecision), '📌 Épingler', '✓ Épinglée');
+            this.mark(button, pinned.has(button.dataset.pinDecision), `📌 ${this.labelsValue.pin}`, this.labelsValue.pinned);
         });
         this.element.querySelectorAll('[data-pin-principle]').forEach((button) => {
-            this.mark(button, principles.has(button.dataset.pinPrinciple), '📌 Retenir', '✓ Retenu');
+            this.mark(button, principles.has(button.dataset.pinPrinciple), `📌 ${this.labelsValue.keep}`, this.labelsValue.kept);
         });
         this.element.querySelectorAll('[data-exclude-decision]').forEach((button) => {
             const on = excluded.has(button.dataset.excludeDecision);
-            this.mark(button, on, '🚫 Écarter', '↺ Rétablir');
+            this.mark(button, on, `🚫 ${this.labelsValue.exclude}`, this.labelsValue.restore);
             button.closest('[data-decision]')?.classList.toggle('excluded', on);
         });
     }
