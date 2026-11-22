@@ -11,6 +11,7 @@ use PhpOffice\PhpWord\PhpWord;
 use PhpOffice\PhpWord\Shared\Html;
 use PhpOffice\PhpWord\SimpleType\Jc;
 use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 /**
  * The consultation as a Word document (ADR 0005): built from the same HTML as the
@@ -21,6 +22,7 @@ final readonly class ConsultationExporter
     public function __construct(
         private ConsultationRenderer $renderer,
         private DenormalizerInterface $denormalizer,
+        private TranslatorInterface $translator,
     ) {
     }
 
@@ -43,11 +45,12 @@ final readonly class ConsultationExporter
         $word->getDocInfo()->setTitle($dossier->getTitle())->setCreator('Judilibre Agent');
 
         $section = $word->addSection(['marginTop' => 1200, 'marginBottom' => 1200, 'marginLeft' => 1300, 'marginRight' => 1300]);
-        $section->addFooter()->addText(ConsultationRenderer::FOOTER, ['size' => 8, 'italic' => true, 'color' => '64748B'], ['alignment' => Jc::CENTER]);
+        $section->addFooter()->addText($this->renderer->footer(), ['size' => 8, 'italic' => true, 'color' => '64748B'], ['alignment' => Jc::CENTER]);
 
-        $section->addTitle('Consultation juridique', 0);
-        $section->addText('' === $dossier->getTitle() ? 'Dossier' : $dossier->getTitle(), ['size' => 13, 'color' => '475569']);
-        $section->addText('Le '.(new \IntlDateFormatter('fr_FR', \IntlDateFormatter::LONG, \IntlDateFormatter::NONE))->format(new \DateTimeImmutable()), ['size' => 9, 'color' => '64748B']);
+        $section->addTitle($this->translator->trans('document.heading'), 0);
+        $section->addText('' === $dossier->getTitle() ? $this->translator->trans('consultation.untitled') : $dossier->getTitle(), ['size' => 13, 'color' => '475569']);
+        $date = (new \IntlDateFormatter($this->translator->getLocale(), \IntlDateFormatter::LONG, \IntlDateFormatter::NONE))->format(new \DateTimeImmutable());
+        $section->addText($this->translator->trans('consultation.dated', ['%date%' => $date]), ['size' => 9, 'color' => '64748B']);
 
         foreach ($rendered['sections'] as $i => $part) {
             $section->addTitle(\sprintf('%s. %s', self::roman($i + 1), $part['title']), 1);
@@ -55,7 +58,7 @@ final readonly class ConsultationExporter
         }
 
         if ([] !== $rendered['annex']) {
-            $section->addTitle('Annexe — Décisions citées', 1);
+            $section->addTitle($this->translator->trans('document.annex'), 1);
             foreach ($rendered['annex'] as $decision) {
                 $section->addListItemRun(0)->addLink($decision['url'], htmlspecialchars($decision['citation'], \ENT_XML1), ['color' => '4338CA', 'underline' => 'single']);
             }

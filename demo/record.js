@@ -1,52 +1,55 @@
 // Records the demo: title cards, then a real dossier from the problem to the Word
 // export, in a 1600x900 browser with a visible cursor. Run it with Playwright MCP's
 // browser_run_code (filename: demo/record.js), logged in on http://127.0.0.1:8000.
-// Returns the milestones (seconds since the video started) that demo/assemble.swift cuts on.
+// Returns the milestones (seconds since the video started) that demo/assemble.py cuts on,
+// and the spotlights (an element and its label) that demo/assemble.swift draws over the video.
 async (page) => {
     const BASE = 'http://127.0.0.1:8000';
     const W = 1600, H = 900;
 
-    const card = (inner) => `<!doctype html><html lang="fr"><head><meta charset="utf-8"><style>
+    // The cards animate in: each block slides up after the previous one.
+    const card = (inner) => `<!doctype html><html lang="en"><head><meta charset="utf-8"><style>
         html,body{margin:0;height:100%;font-family:-apple-system,"SF Pro Display","Helvetica Neue",sans-serif;color:#fff}
         body{display:flex;align-items:center;justify-content:center;background:radial-gradient(1200px 700px at 20% 10%,#4338ca 0%,#1e1b4b 55%,#0b0a1f 100%)}
         .wrap{max-width:1180px;padding:0 80px}
+        .wrap>*,.grid>*{opacity:0;animation:in .55s cubic-bezier(.2,.7,.2,1) forwards}
+        .wrap>:nth-child(2){animation-delay:.12s}.wrap>:nth-child(3){animation-delay:.24s}.wrap>:nth-child(4){animation-delay:.36s}
+        .grid>:nth-child(1){animation-delay:.5s}.grid>:nth-child(2){animation-delay:.65s}.grid>:nth-child(3){animation-delay:.8s}.grid>:nth-child(4){animation-delay:.95s}
+        @keyframes in{from{opacity:0;transform:translateY(24px)}to{opacity:1;transform:none}}
         .kicker{font-size:22px;letter-spacing:.28em;text-transform:uppercase;color:#a5b4fc}
-        h1{font-size:84px;line-height:1.02;margin:.25em 0 .2em;font-weight:750;letter-spacing:-.02em}
+        h1{font-size:80px;line-height:1.02;margin:.25em 0 .2em;font-weight:750;letter-spacing:-.02em}
         p{font-size:30px;line-height:1.45;color:#c7d2fe;margin:0}
-        .steps{display:grid;grid-template-columns:repeat(4,1fr);gap:18px;margin-top:48px}
-        .step{background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.18);border-radius:18px;padding:22px}
-        .step b{display:block;font-size:24px;margin-bottom:8px}.step span{font-size:18px;color:#c7d2fe;line-height:1.4}
-        .stack{display:grid;grid-template-columns:repeat(3,1fr);gap:18px;margin-top:40px}
-        .chip{background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.18);border-radius:18px;padding:22px 24px}
-        .chip b{display:block;font-size:26px}.chip span{font-size:18px;color:#c7d2fe}
+        .grid{display:grid;grid-template-columns:repeat(var(--n,3),1fr);gap:18px;margin-top:44px}
+        .grid>div{background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.18);border-radius:18px;padding:22px 24px}
+        .grid b{display:block;font-size:25px;margin-bottom:8px}.grid span{font-size:18px;color:#c7d2fe;line-height:1.4}
         .scale{font-size:96px}
     </style></head><body><div class="wrap">${inner}</div></body></html>`;
 
+    // Each card is held as long as demo/assemble.py shows it.
     const CARDS = {
-        title: card(`<div class="scale">⚖️</div><div class="kicker">Judilibre Agent</div>
-            <h1>De votre problème juridique<br>à la consultation prête à plaider.</h1>
-            <p>Un agent IA qui cherche, trie et rédige avec l'avocat, sur la jurisprudence de la Cour de cassation.</p>`),
-        problem: card(`<div class="kicker">Le problème</div>
-            <h1>Des heures de recherche<br>pour chaque plaidoirie.</h1>
-            <p>Trouver les bons arrêts parmi des milliers, les trier, puis rédiger.</p>
-            <div class="steps">
-                <div class="step"><b>1. Qualifier</b><span>L'agent pose les bonnes questions.</span></div>
-                <div class="step"><b>2. Planifier</b><span>L'avocat valide la fiche et les axes.</span></div>
-                <div class="step"><b>3. Chercher & trier</b><span>Judilibre interrogé, Jev trie.</span></div>
-                <div class="step"><b>4. Rédiger</b><span>Une consultation vérifiée, en Word.</span></div>
-            </div>`),
-        stack: card(`<div class="kicker">Sous le capot</div><h1>Une architecture agentique.</h1>
-            <div class="stack">
-                <div class="chip"><b>Symfony 8 · Symfony AI</b><span>Agent, tools, phases gardées par le serveur</span></div>
-                <div class="chip"><b>AG-UI</b><span>Streaming, interrupts, composants Twig</span></div>
-                <div class="chip"><b>Claude Opus</b><span>Qualification, raisonnement, rédaction</span></div>
-                <div class="chip"><b>Jev · TypeSafe AI</b><span>Tri de centaines de décisions en parallèle</span></div>
-                <div class="chip"><b>API Judilibre</b><span>L'open data de la Cour de cassation</span></div>
-                <div class="chip"><b>Doctrine · Lock</b><span>Dossiers persistés, un run à la fois</span></div>
-            </div>`),
-        end: card(`<div class="scale">⚖️</div><div class="kicker">Judilibre Agent</div>
-            <h1>La jurisprudence, triée,<br>comprise, et prête à plaider.</h1>
-            <p>Symfony AI · AG-UI · Claude Opus · Jev · Judilibre</p>`),
+        title: [3000, card(`<div class="scale">⚖️</div><div class="kicker">Judilibre Agent</div>
+            <h1>Your legal documents,<br>drafted with AI.</h1>
+            <p>Formal notices · writs of summons · pleadings · legal opinions · petitions</p>`)],
+        problem: [3500, card(`<div class="kicker">For young and independent lawyers</div>
+            <h1>Hours of work<br>for every document.</h1>
+            <p>Big firms have teams for that. A lawyer on their own doesn't.<br>Judilibre Agent: lower cost, much faster.</p>`)],
+        workflow: [4500, card(`<div class="kicker">Not a chatbot</div>
+            <h1>A complete workflow,<br>guided by several AIs.</h1>
+            <div class="grid" style="--n:4">
+                <div><b>1. Qualify</b><span>Questions in a form</span></div>
+                <div><b>2. Search & sort</b><span>Judilibre queried, Jev sorts</span></div>
+                <div><b>3. Select</b><span>Principles and rulings, pinned</span></div>
+                <div><b>4. Write</b><span>A checked document, in Word</span></div>
+            </div>`)],
+        symfony: [6000, card(`<div class="kicker">Under the hood</div><h1>Built with Symfony.</h1>
+            <div class="grid">
+                <div><b>Symfony AI</b><span>Several models together: Claude Opus reasons and writes, Jev sorts. Every tool, a PHP class.</span></div>
+                <div><b>AG-UI, in PHP</b><span>The protocol, implemented and plugged into Symfony AI: messages, tools, state, live.</span></div>
+                <div><b>Symfony UX</b><span>Twig and Live Components, Stimulus, Turbo: a dynamic UI, no JS framework.</span></div>
+            </div>`)],
+        end: [4000, card(`<div class="scale">⚖️</div><div class="kicker">Symfony, essential</div>
+            <h1>Case law, sorted,<br>understood, ready to plead.</h1>
+            <p>Symfony AI · AG-UI · Symfony UX · Doctrine · Security · Lock · Validator</p>`)],
     };
 
     const context = await page.context().browser().newContext({
@@ -54,7 +57,7 @@ async (page) => {
         recordVideo: { dir: 'demo/output/raw', size: { width: W, height: H } },
         storageState: await page.context().storageState(),
         acceptDownloads: true,
-        locale: 'fr-FR',
+        locale: 'en-US',
     });
     // A visible cursor: the recording does not show the system one.
     await context.addInitScript(() => {
@@ -75,17 +78,29 @@ async (page) => {
     const t0 = Date.now();
     const marks = [];
     const mark = (id) => marks.push({ id, t: (Date.now() - t0) / 1000 });
+    // A spotlight: the element's box and a label, drawn by demo/assemble.swift.
+    const spots = [];
     let failure = null;
     try {
         const pause = (ms) => p.waitForTimeout(ms);
         let mouse = { x: W / 2, y: H / 2 };
+        // Scrolling an element into view may scroll the window too: it is put back.
+        const unscroll = () => p.evaluate(() => { document.scrollingElement.scrollTop = 0; });
         const moveTo = async (locator) => {
             await locator.scrollIntoViewIfNeeded();
+            await unscroll();
             const box = await locator.boundingBox();
             const x = box.x + box.width / 2, y = box.y + box.height / 2;
             await p.mouse.move(x, y, { steps: 18 });
             mouse = { x, y };
         };
+        // Where the element is now, without scrolling: the window itself never scrolls.
+        const spot = async (locator, label) => {
+            await unscroll();
+            const box = await locator.boundingBox();
+            if (box) spots.push({ t: (Date.now() - t0) / 1000, label, box: { x: box.x, y: box.y, w: box.width, h: box.height } });
+        };
+        const showCard = async (id) => { await p.setContent(CARDS[id][1]); mark(id); await pause(CARDS[id][0] + 300); };
         const click = async (locator) => { await moveTo(locator); await pause(250); await locator.click(); await pause(350); };
         const scrollEl = async (selector, dy, steps = 30) => {
             for (let i = 0; i < steps; i++) {
@@ -96,17 +111,16 @@ async (page) => {
         const MESSAGES = '[data-agent-chat-target="messages"]';
 
         // — Title cards —
-        await p.setContent(CARDS.title); mark('title'); await pause(6000);
-        await p.setContent(CARDS.problem); mark('problem'); await pause(6000);
+        for (const id of ['title', 'problem', 'workflow']) await showCard(id);
 
         // — A new dossier —
         await p.goto(BASE + '/'); mark('start'); await pause(1500);
-        await click(p.getByText('Nouveau dossier', { exact: false }).first());
+        await click(p.getByText('New case', { exact: false }).first());
         await p.waitForSelector('textarea[data-agent-chat-target="input"]');
         await pause(800);
         const input = p.locator('textarea[data-agent-chat-target="input"]');
         await click(input);
-        await input.pressSequentially("Mon client, chef d'équipe dans une PME de logistique depuis 12 ans, a été licencié après 8 mois d'arrêt maladie. L'employeur invoque la désorganisation de l'entreprise, mais il n'a été remplacé que par des intérimaires. Peut-il contester ?", { delay: 12 });
+        await input.pressSequentially("My client, a team leader at a logistics SME for 12 years, was dismissed after 8 months of sick leave. The employer cites the disruption of the company, but he was only replaced by temps. Can he challenge it?", { delay: 12 });
         await pause(600);
         await p.keyboard.press('Enter');
         mark('sent');
@@ -121,7 +135,7 @@ async (page) => {
                     if ((await question.getAttribute('data-type')) === 'multiple' && count > 2) await click(chips.nth(pick + 1));
                 } else {
                     await click(question.locator('textarea'));
-                    await question.locator('textarea').pressSequentially("Convention collective des transports routiers, 45 salariés, agent de maîtrise. Intérimaire en poste dès le 2e mois d'arrêt ; aucun CDI 3 mois après.", { delay: 6 });
+                    await question.locator('textarea').pressSequentially("Road transport collective agreement, 45 employees, supervisor. A temp in the job from the 2nd month of leave; no permanent hire 3 months later.", { delay: 6 });
                 }
             }
             await pause(500);
@@ -130,6 +144,7 @@ async (page) => {
         const forms = () => p.locator('[data-controller="questions"]').count();
         await p.waitForSelector('[data-controller="questions"] [data-questions-target="submit"]', { timeout: 240000 });
         await pause(1200);
+        await spot(p.locator('[data-controller="questions"]').last(), 'A form, generated by the agent');
         mark('questions');
         for (let round = 1; round <= 3; round++) {
             const before = await forms();
@@ -148,10 +163,12 @@ async (page) => {
         await moveTo(plan.locator('textarea[data-field="facts"]'));
         await pause(1500);
         await scrollEl(MESSAGES, 500, 40);
-        await click(plan.getByText('Ajouter un axe'));
+        await spot(plan, 'Editable brief and axes');
+        await click(plan.getByText('Add an axis'));
         const added = plan.locator('[data-research-plan-target="axis"]').last();
-        await added.locator('[data-role="title"]').pressSequentially('Indemnité compensatrice de préavis du salarié malade', { delay: 18 });
+        await added.locator('[data-role="title"]').pressSequentially('Notice pay for an employee on sick leave', { delay: 18 });
         await pause(800);
+        await spot(added, 'An axis added by the lawyer');
         await click(plan.locator('[data-research-plan-target="approve"]'));
         mark('validated');
 
@@ -162,17 +179,19 @@ async (page) => {
         const findings = p.locator('[data-controller="findings"]').last();
         await findings.evaluate((e) => e.scrollIntoView({ block: 'start' }));
         await pause(1500);
+        await spot(findings.locator('[data-pin-principle]').first(), 'Pin a principle');
         await click(findings.locator('[data-pin-principle]').first());
         await click(findings.locator('[data-pin-decision]').nth(0));
         await scrollEl(MESSAGES, 260, 25);
         await click(findings.locator('[data-pin-decision]').nth(1));
         await scrollEl(MESSAGES, 700, 50);
         const excludes = findings.locator('[data-exclude-decision]');
+        await spot(excludes.nth(Math.min(5, (await excludes.count()) - 1)), 'Discard a ruling');
         await click(excludes.nth(Math.min(5, (await excludes.count()) - 1)));
         await pause(800);
         await findings.locator('[data-findings-target="instruction"]').scrollIntoViewIfNeeded();
         await click(findings.locator('[data-findings-target="instruction"]'));
-        await findings.locator('[data-findings-target="instruction"]').pressSequentially("Insiste sur l'absence de remplacement définitif.", { delay: 15 });
+        await findings.locator('[data-findings-target="instruction"]').pressSequentially("Stress the lack of a permanent replacement.", { delay: 15 });
         const formsBeforeFraming = await forms();
         await click(findings.locator('[data-ag-ui-action-param="write"]'));
         mark('write');
@@ -193,8 +212,9 @@ async (page) => {
 
         // — Writing —
         await p.waitForSelector('#section-faits', { timeout: 300000 });
+        await spot(p.locator('#section-faits'), 'The opinion being written');
         mark('redaction');
-        await p.waitForFunction(() => document.querySelector('[aria-current=step]')?.innerText.includes('Livr'), null, { timeout: 900000 });
+        await p.waitForFunction(() => document.querySelector('[aria-current=step]')?.innerText.includes('Delivered'), null, { timeout: 900000 });
         await pause(2500);
         mark('delivered');
 
@@ -206,15 +226,15 @@ async (page) => {
         await pause(800);
         await scrollEl('#consultation-panel .overflow-y-auto', 6000, 60);
         await pause(1500);
+        await spot(p.getByText('Export to Word'), 'Word export');
         const download = p.waitForEvent('download');
-        await click(p.getByText('Exporter en Word'));
+        await click(p.getByText('Export to Word'));
         await (await download).saveAs('demo/output/consultation.docx');
         await pause(2000);
         mark('exported');
 
         // — Closing cards —
-        await p.setContent(CARDS.stack); mark('stack'); await pause(6000);
-        await p.setContent(CARDS.end); mark('end'); await pause(5000);
+        for (const id of ['symfony', 'end']) await showCard(id);
         mark('stop');
 
     } catch (e) {
@@ -225,5 +245,5 @@ async (page) => {
     const dossierUrl = p.url();
     await context.close();
 
-    return { video: await video.path(), marks, dossierUrl, failure };
+    return { video: await video.path(), marks, spots, dossierUrl, failure };
 }

@@ -11,6 +11,7 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Security\Core\Exception\AuthenticationException;
 use Symfony\Component\Security\Http\EntryPoint\AuthenticationEntryPointInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 /**
  * Pages send a visitor to the login form. The agent stream and Live Components are
@@ -20,13 +21,14 @@ final readonly class LoginEntryPoint implements AuthenticationEntryPointInterfac
 {
     public function __construct(
         private UrlGeneratorInterface $urls,
+        private TranslatorInterface $translator,
     ) {
     }
 
     public function start(Request $request, ?AuthenticationException $authException = null): Response
     {
         if (str_starts_with($request->getPathInfo(), '/agent/') || str_starts_with($request->getPathInfo(), '/_components/')) {
-            return new JsonResponse(['message' => 'Session expirée : rechargez la page pour vous reconnecter.'], Response::HTTP_UNAUTHORIZED);
+            return new JsonResponse(['message' => $this->translator->trans('research.session_expired')], Response::HTTP_UNAUTHORIZED);
         }
 
         return new RedirectResponse($this->urls->generate('login'));

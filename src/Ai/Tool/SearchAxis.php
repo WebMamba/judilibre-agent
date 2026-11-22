@@ -17,6 +17,7 @@ use App\Triage\Triage;
 use App\Triage\Verdict;
 use Psr\Log\LoggerInterface;
 use Symfony\AI\Agent\Toolbox\Attribute\AsTool;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 /**
  * Searches one axis of the approved plan, and has the triage model sort what it found
@@ -48,6 +49,7 @@ final readonly class SearchAxis
         private Triage $triage,
         private ResearchState $state,
         private LoggerInterface $logger,
+        private TranslatorInterface $translator,
     ) {
     }
 
@@ -189,7 +191,7 @@ final readonly class SearchAxis
 
             $candidates[] = new Candidate(
                 $id,
-                Citation::of($result),
+                Citation::of($result, $this->translator),
                 implode("\n", $lines),
                 '' === $summary ? null : $summary,
                 \is_string($result['decision_date'] ?? null) ? $result['decision_date'] : null,

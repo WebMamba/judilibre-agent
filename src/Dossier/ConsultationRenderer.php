@@ -7,6 +7,7 @@ namespace App\Dossier;
 use App\Judilibre\Citation;
 use App\Research\Consultation;
 use League\CommonMark\GithubFlavoredMarkdownConverter;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 /**
  * The consultation as HTML (ADR 0005): each [[id]] becomes the decision's citation,
@@ -15,12 +16,11 @@ use League\CommonMark\GithubFlavoredMarkdownConverter;
  */
 final class ConsultationRenderer
 {
-    public const string FOOTER = "Document d'aide à la décision généré par une intelligence artificielle à partir de Judilibre. Il ne remplace pas l'analyse d'un avocat : vérifiez chaque décision citée avant de l'invoquer.";
-
     private GithubFlavoredMarkdownConverter $markdown;
 
-    public function __construct()
-    {
+    public function __construct(
+        private readonly TranslatorInterface $translator,
+    ) {
         $this->markdown = new GithubFlavoredMarkdownConverter(['html_input' => 'escape', 'allow_unsafe_links' => false]);
     }
 
@@ -40,7 +40,7 @@ final class ConsultationRenderer
             $cited = [...$cited, ...Consultation::citationsIn($markdown)];
             $sections[] = [
                 'key' => (string) ($section['key'] ?? ''),
-                'title' => (string) ($section['title'] ?? ''),
+                'title' => $this->translator->trans('consultation.section.'.($section['key'] ?? '')),
                 'html' => $this->html($markdown, $citations),
                 'undoable' => null !== ($section['previous'] ?? null),
             ];
@@ -57,6 +57,12 @@ final class ConsultationRenderer
             'complete' => [] === array_diff($order, array_column($sections, 'key')),
             'stale' => (bool) ($consultation['stale'] ?? false),
         ];
+    }
+
+    /** The fixed AI notice under the document. */
+    public function footer(): string
+    {
+        return $this->translator->trans('consultation.footer');
     }
 
     /** @param array<string, string> $citations */

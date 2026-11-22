@@ -8,6 +8,7 @@ use App\Judilibre\Citation;
 use App\Judilibre\DecisionCatalog;
 use App\Judilibre\JudilibreException;
 use Symfony\AI\Agent\Toolbox\Attribute\AsTool;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 #[AsTool(
     name: 'read_decision',
@@ -23,6 +24,8 @@ final readonly class ReadDecision
 
     public function __construct(
         private DecisionCatalog $catalog,
+        /** Cites in the page's language; in French without it. */
+        private ?TranslatorInterface $translator = null,
     ) {
     }
 
@@ -42,7 +45,7 @@ final readonly class ReadDecision
 
         return [
             'id' => $id,
-            'citation' => Citation::of($decision),
+            'citation' => Citation::of($decision, $this->translator),
             'url' => Citation::url($id),
             'ecli' => $decision['ecli'] ?? null,
             'publication' => $decision['publication'] ?? [],

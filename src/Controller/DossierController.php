@@ -27,6 +27,7 @@ use Symfony\Component\Security\Http\Attribute\IsCsrfTokenValid;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 use Symfony\Component\Uid\Ulid;
 
 /**
@@ -59,7 +60,7 @@ final class DossierController extends AbstractController
     }
 
     #[Route('/dossiers/{id}', name: 'dossier_show', requirements: ['id' => Dossier::ID_PATTERN], methods: ['GET'])]
-    public function show(string $id): Response
+    public function show(string $id, TranslatorInterface $translator): Response
     {
         $dossier = $this->dossiers->find($id);
         if (null !== $dossier) {
@@ -79,7 +80,7 @@ final class DossierController extends AbstractController
             'citations' => $citations,
             'messages' => $dossier?->getMessages() ?? [],
             'interrupts' => $dossier?->getInterrupts() ?? [],
-            'turns' => TranscriptView::turns($dossier?->getMessages() ?? [], $dossier?->getInterrupts() ?? []),
+            'turns' => TranscriptView::turns($dossier?->getMessages() ?? [], $dossier?->getInterrupts() ?? [], $translator),
         ]);
     }
 
@@ -154,7 +155,7 @@ final class DossierController extends AbstractController
     {
         $lock = $this->locks->createLock('dossier-'.$dossier->getId(), 30.0);
         if (!$lock->acquire()) {
-            throw new ConflictHttpException('Un run est déjà en cours sur ce dossier.');
+            throw new ConflictHttpException('A run is already in progress on this dossier.');
         }
 
         try {

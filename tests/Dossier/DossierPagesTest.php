@@ -54,7 +54,7 @@ final class DossierPagesTest extends WebTestCase
             ['id' => 'u1', 'role' => 'user', 'content' => 'Mon client a été licencié pendant son arrêt maladie.'],
             ['id' => 'm1', 'role' => 'assistant', 'content' => 'Voici la **consultation**. <script>alert(1)</script>', 'toolCalls' => [
                 ['id' => 'c1', 'type' => 'function', 'function' => ['name' => 'ask_questions', 'arguments' => '{}']],
-                ['id' => 'c2', 'type' => 'function', 'function' => ['name' => 'write_section', 'arguments' => '{}']],
+                ['id' => 'c2', 'type' => 'function', 'function' => ['name' => 'write_section', 'arguments' => '{"section":"faits"}']],
             ]],
             ['id' => 't1', 'role' => 'tool', 'toolCallId' => 'c1', 'content' => 'Réponses'],
             ['id' => 't2', 'role' => 'tool', 'toolCallId' => 'c2', 'content' => 'Section « Faits » rédigée.'],
@@ -70,7 +70,7 @@ final class DossierPagesTest extends WebTestCase
         self::assertStringNotContainsString('<script>alert(1)</script>', $this->client->getInternalResponse()->getContent(), 'The model\'s HTML is escaped.');
         self::assertSelectorNotExists('[data-ag-ui-activity="act_c1"]', 'An answered form shows its answers instead.');
         self::assertSelectorTextContains('[data-agent-chat-target="messages"]', 'Réponses');
-        self::assertSelectorTextContains('.tool-call', 'Rédaction — Section « Faits » rédigée.');
+        self::assertSelectorTextContains('.tool-call', 'Rédaction de la section « Faits »');
         self::assertSelectorTextContains('#consultation-panel', 'Cour de cassation, Chambre sociale, 13 mars 2024');
         self::assertSelectorTextContains('#consultation-panel', 'Annexe — Décisions citées');
         self::assertSelectorTextContains('#consultation-panel', 'ne remplace pas l\'analyse d\'un avocat');

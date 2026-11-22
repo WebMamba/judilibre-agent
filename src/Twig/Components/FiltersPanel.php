@@ -12,6 +12,7 @@ use Symfony\UX\LiveComponent\Attribute\LiveArg;
 use Symfony\UX\LiveComponent\Attribute\LiveProp;
 use Symfony\UX\LiveComponent\ComponentToolsTrait;
 use Symfony\UX\LiveComponent\DefaultActionTrait;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 /**
  * The filters of the shared research state (ADR 0002), as the user edits them.
@@ -26,8 +27,6 @@ final class FiltersPanel
     use ComponentToolsTrait;
     use DefaultActionTrait;
 
-    public const array JURISDICTIONS = ['cc' => 'Cour de cassation', 'ca' => "Cours d'appel", 'tj' => 'Tribunaux judiciaires', 'tcom' => 'Tribunaux de commerce'];
-    public const array PUBLICATIONS = ['b' => 'Bulletin', 'r' => 'Rapport', 'l' => 'Lettres de chambre', 'c' => 'Communiqué'];
     private const array LISTS = ['jurisdictions', 'chambers', 'locations', 'publications'];
 
     /** @var array{jurisdictions: list<string>, chambers: list<string>, locations: list<string>, publications: list<string>, dateStart: ?string, dateEnd: ?string} */
@@ -36,6 +35,7 @@ final class FiltersPanel
 
     public function __construct(
         private readonly Taxonomy $taxonomy,
+        private readonly TranslatorInterface $translator,
     ) {
         $this->filters = (array) new SearchFilters();
     }
@@ -87,12 +87,22 @@ final class FiltersPanel
     public function options(string $field): array
     {
         return match ($field) {
-            'jurisdictions' => self::JURISDICTIONS,
-            'publications' => self::PUBLICATIONS,
-            'chambers' => $this->taxonomy->labels('chamber', 'cc'),
+            'jurisdictions' => $this->translated('jurisdiction', SearchFilters::JURISDICTIONS),
+            'publications' => $this->translated('publication', SearchFilters::PUBLICATIONS),
+            'chambers' => array_map(fn (string $label): string => $this->translator->trans($label, [], 'judilibre'), $this->taxonomy->labels('chamber', 'cc')),
             'locations' => $this->taxonomy->labels('location', 'ca'),
             default => [],
         };
+    }
+
+    /**
+     * @param list<string> $keys
+     *
+     * @return array<string, string>
+     */
+    private function translated(string $prefix, array $keys): array
+    {
+        return array_combine($keys, array_map(fn (string $key): string => $this->translator->trans($prefix.'.'.$key), $keys));
     }
 
     private function dateChanged(string $field, ?string $previous): void

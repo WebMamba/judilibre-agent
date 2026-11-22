@@ -31,7 +31,15 @@ ai:
                     une consultation juridique en vue d'une éventuelle plaidoirie, appuyée sur
                     la jurisprudence de Judilibre, la base open data de la Cour de cassation
                     (arrêts de la Cour de cassation, décisions des cours d'appel, des tribunaux
-                    judiciaires et des tribunaux de commerce). Vous répondez en français.
+                    judiciaires et des tribunaux de commerce).
+
+                    Langue de l'utilisateur (code ISO 639-1) : %env(APP_LOCALE)%. Écrivez dans
+                    cette langue tout ce que l'utilisateur lit : vos messages, vos questions et
+                    leurs options, la fiche dossier, les axes, les principes, la pertinence des
+                    décisions, le titre du dossier et la consultation. Les décisions de
+                    Judilibre sont en français : rendez leur sens dans cette langue. Les
+                    requêtes Judilibre (`search_axis`) restent en français, et les clés
+                    attendues par les tools (sections, ids) ne changent pas.
 
                     ## Le déroulé d'un dossier
                     La phase du dossier vous est donnée au début de chaque run. Le serveur

@@ -103,3 +103,56 @@ login:
     error: E-mail ou mot de passe incorrect.
     logout: Déconnexion
     throttled: "Trop de tentatives de connexion : réessayez dans quelques minutes."
+consultation:
+    footer: "Document d'aide à la décision généré par une intelligence artificielle à partir de Judilibre. Il ne remplace pas l'analyse d'un avocat : vérifiez chaque décision citée avant de l'invoquer."
+    dated: "Le %date%"
+    untitled: Dossier
+    section:
+        faits: Faits
+        problematique: Problématique
+        reponse: Réponse synthétique
+        discussion: Discussion
+        risques: Évaluation des risques
+        plaidoirie: Arguments de plaidoirie recommandés
+stance:
+    favorable: Favorable
+    defavorable: Défavorable
+    contexte: Contexte
+jurisdiction:
+    cc: Cour de cassation
+    ca: "Cours d'appel"
+    tj: Tribunaux judiciaires
+    tcom: Tribunaux de commerce
+publication:
+    b: Bulletin
+    r: Rapport
+    l: Lettres de chambre
+    c: Communiqué
+tool:
+    ask_questions: "❓ Préparation des questions…"
+    ask_questions_done: "❓ Questions"
+    propose_research_plan: "📝 Préparation de la fiche dossier et du plan…"
+    propose_research_plan_done: "📝 Fiche dossier et plan de recherche"
+    search_axis: "🔎 Recherche de l'axe %axis%"
+    search_axis_done: "🔎 Recherche et tri"
+    retained_one: "{count} décision retenue sur {candidates}"
+    retained_many: "{count} décisions retenues sur {candidates}"
+    search_by_jev: tri par Jev
+    retained: "{0}aucune décision retenue sur %candidates%|{1}1 décision retenue sur %candidates%|]1,Inf[%count% décisions retenues sur %candidates%"
+    axis: "axe %axis%"
+    read_decision: "📄 Lecture d'une décision"
+    present_findings: "⚖️ Préparation des principes et des décisions…"
+    present_findings_done: "⚖️ Principes et décisions"
+    write_section: "✍️ Rédaction"
+    write_section_of: "✍️ Rédaction de la section « %section% »"
+    write_refused: section refusée
+    write_done: rédigée
+    list_taxonomy: "📚 Consultation des listes Judilibre"
+    set_filters: "🎚️ Mise à jour des filtres"
+research:
+    busy: "Un run est en cours sur ce dossier : réessayez dans un instant."
+    failed: Action impossible.
+    pinned: "✓ Épinglée"
+    principle_pinned: "✓ Retenu"
+    restore: "↺ Rétablir"
+    session_expired: "Session expirée : rechargez la page pour vous reconnecter."
