@@ -8,6 +8,9 @@ Demo : https://72-61-193-89.sslip.io,
 •⁠  ⁠e-mail : admin@judilibre.local
 •⁠  ⁠pw : U6yLzNyoeHY6vHXeTf4D
 
+Demo video:
+https://youtu.be/UfzXWhSUd54
+
 For young and independent lawyers
 ----------------------------------
 
