@@ -4,6 +4,10 @@ Cassius
 Your legal documents, drafted with AI: formal notices, writs of summons, pleadings, legal
 opinions, petitions.
 
+Demo : https://72-61-193-89.sslip.io,
+•⁠  ⁠e-mail : admin@judilibre.local
+•⁠  ⁠pw : U6yLzNyoeHY6vHXeTf4D
+
 For young and independent lawyers
 ----------------------------------
 
