@@ -35,10 +35,21 @@ export default class extends Controller {
         event.target.form.requestSubmit();
     }
 
-    /** Before ag-ui#send takes the input: the user's message, and an empty turn. */
-    send() {
+    /**
+     * Before ag-ui#send takes the input: the user's message, and an empty turn. The input
+     * locks now, not at RUN_STARTED: a second Enter before the first event would post a
+     * second run, which the dossier's lock answers with a 409. A send while a run is on
+     * never reaches ag-ui#send.
+     */
+    send(event) {
+        if (this.busy) {
+            event.preventDefault();
+            event.stopImmediatePropagation();
+            return;
+        }
         const text = this.inputTarget.value.trim();
         if (text === '') return;
+        this.setBusy(true);
         this.hidePlaceholder();
         this.appendUserMessage(text);
         this.turn = this.appendAssistantTurn();
@@ -244,6 +255,7 @@ export default class extends Controller {
     }
 
     setBusy(busy) {
+        this.busy = busy;
         const locked = busy || this.waiting;
         this.submitTarget.disabled = locked;
         this.inputTarget.disabled = locked;
