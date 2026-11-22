@@ -29,9 +29,6 @@ use Symfony\Component\Routing\Attribute\Route;
  */
 final class StreamController extends AbstractController
 {
-    /** Long enough for the longest run: searches, triage, a consultation. */
-    private const float LOCK_TTL = 900.0;
-
     #[Route('/agent/stream', name: 'agent_stream', methods: ['POST'])]
     public function __invoke(
         Request $request,
@@ -53,7 +50,7 @@ final class StreamController extends AbstractController
             throw new AccessDeniedHttpException('This dossier is not yours.');
         }
 
-        $lock = $locks->createLock('dossier-'.$dossier->getId(), self::LOCK_TTL);
+        $lock = $locks->createLock('dossier-'.$dossier->getId(), DossierRuns::LOCK_TTL);
         if (!$lock->acquire()) {
             throw new ConflictHttpException('A run is already in progress on this dossier.');
         }

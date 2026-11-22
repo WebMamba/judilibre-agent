@@ -1,2 +1,5 @@
 framework:
-    lock: '%env(LOCK_DSN)%'
+    # The locks live in the database (table lock_keys) and expire: a run that dies or
+    # hangs frees its dossier once its TTL is over. A flock is only freed with the
+    # request that holds it, and FrankenPHP never restarts its process.
+    lock: 'doctrine.dbal.default_connection'

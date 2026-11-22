@@ -175,6 +175,22 @@ final class AgentStreamTest extends WebTestCase
         }
     }
 
+    /** A run that died or hangs without releasing its lock: the dossier is freed once its TTL is over. */
+    public function testTheLockOfAnAbandonedRunExpires(): void
+    {
+        $abandoned = self::getContainer()->get(LockFactory::class)->createLock('dossier-'.$this->thread, 1.0, autoRelease: false);
+        self::assertTrue($abandoned->acquire());
+
+        $this->post(['threadId' => $this->thread, 'runId' => 'r', 'messages' => [['id' => 'u1', 'role' => 'user', 'content' => 'Bonjour']]]);
+        self::assertResponseStatusCodeSame(409);
+
+        sleep(2);
+        ScriptedPlatform::$rounds = [[new TextDelta('Bonjour.')]];
+        $events = $this->stream();
+
+        self::assertSame('RUN_FINISHED', end($events)['type']);
+    }
+
     public function testAStateThatIsNotOneIsRejected(): void
     {
         $this->post(['threadId' => $this->thread, 'runId' => 'r', 'messages' => [], 'state' => ['filters' => ['jurisdictions' => ['cour-supreme']]]]);
