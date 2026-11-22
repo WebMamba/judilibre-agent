@@ -3,7 +3,7 @@
 services:
   app:
     build: .
-    image: judilibre-agent
+    image: cassius
     restart: unless-stopped
     environment:
       SERVER_NAME: ${SERVER_NAME:?Set SERVER_NAME (the domain) in .env.prod.local}

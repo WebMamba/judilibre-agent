@@ -85,7 +85,7 @@ dossier:
     empty: "Épinglez des décisions depuis les résultats 📌 : la consultation devra les discuter."
     unpin: Retirer du dossier
 app:
-    title: Judilibre Agent
+    title: Cassius
     subtitle: "De votre problème à une consultation juridique, appuyée sur la jurisprudence de Judilibre."
 chat:
     welcome: Exposez votre problème juridique.

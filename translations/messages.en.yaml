@@ -85,7 +85,7 @@ dossier:
     empty: "Pin decisions from the results 📌: the opinion will have to discuss them."
     unpin: Remove from the case file
 app:
-    title: Judilibre Agent
+    title: Cassius
     subtitle: "From your problem to a legal opinion, backed by the case law of Judilibre."
 chat:
     welcome: Describe your legal problem.

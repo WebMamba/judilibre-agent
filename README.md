@@ -1,5 +1,5 @@
-Judilibre Agent
-===============
+Cassius
+=======
 
 Your legal documents, drafted with AI: formal notices, writs of summons, pleadings, legal
 opinions, petitions.
@@ -9,13 +9,13 @@ For young and independent lawyers
 
 Every document means hours of work: understanding the case, finding the right rulings
 among thousands, sorting them, then writing it all up properly. Big firms have teams for
-that. A lawyer on their own doesn't. Judilibre Agent does this work with them, at a lower
+that. A lawyer on their own doesn't. Cassius does this work with them, at a lower
 cost and much faster.
 
 Not a chatbot: an intelligent application
 -----------------------------------------
 
-Judilibre Agent is not a chat window with an AI behind it. It is an application that the
+Cassius is not a chat window with an AI behind it. It is an application that the
 lawyer and the agent use **together**, on the same screen and the same dossier.
 
  * **The agent drives the interface.** It doesn't only answer with text: it builds what the
@@ -134,14 +134,14 @@ Access is restricted to the accounts in `APP_USERS` (email => password hash).
 Once, on the VPS:
 
 ```bash
-git clone git@github.com:WebMamba/judilibre-agent.git /srv/judilibre-agent   # with a read-only deploy key
-cd /srv/judilibre-agent
+git clone git@github.com:WebMamba/cassius.git /srv/cassius   # with a read-only deploy key
+cd /srv/cassius
 cp deploy/env.prod.local.dist .env.prod.local && chmod 600 .env.prod.local     # then fill it in
 ./deploy/deploy.sh
 ```
 
 After that, every push to `main` deploys once the tests pass (`.github/workflows/ci.yml`).
-The server (`deploy@72.61.193.89`, `/srv/judilibre-agent`) is set in the workflow. In the
+The server (`deploy@72.61.193.89`, `/srv/cassius`) is set in the workflow. In the
 GitHub repository: the `DEPLOY_ENABLED=true` variable, and the `DEPLOY_SSH_KEY` (a private
 key authorised on the VPS) and `DEPLOY_KNOW_HOSTS` (`ssh-keyscan 72.61.193.89`) secrets.
 

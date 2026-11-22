@@ -27,12 +27,12 @@ async (page) => {
 
     // Each card is held as long as demo/assemble.py shows it.
     const CARDS = {
-        title: [3000, card(`<div class="scale">⚖️</div><div class="kicker">Judilibre Agent</div>
+        title: [3000, card(`<div class="scale">⚖️</div><div class="kicker">Cassius</div>
             <h1>Your legal documents,<br>drafted with AI.</h1>
             <p>Formal notices · writs of summons · pleadings · legal opinions · petitions</p>`)],
         problem: [3500, card(`<div class="kicker">For young and independent lawyers</div>
             <h1>Hours of work<br>for every document.</h1>
-            <p>Big firms have teams for that. A lawyer on their own doesn't.<br>Judilibre Agent: lower cost, much faster.</p>`)],
+            <p>Big firms have teams for that. A lawyer on their own doesn't.<br>Cassius: lower cost, much faster.</p>`)],
         workflow: [4500, card(`<div class="kicker">Not a chatbot</div>
             <h1>A complete workflow,<br>guided by several AIs.</h1>
             <div class="grid" style="--n:4">

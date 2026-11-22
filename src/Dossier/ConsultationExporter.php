@@ -42,7 +42,7 @@ final readonly class ConsultationExporter
         $word->addTitleStyle(0, ['size' => 20, 'bold' => true, 'color' => '1E1B4B']);
         $word->addTitleStyle(1, ['size' => 14, 'bold' => true, 'color' => '312E81'], ['spaceBefore' => 240, 'spaceAfter' => 120]);
         $word->addTitleStyle(2, ['size' => 12, 'bold' => true], ['spaceBefore' => 160, 'spaceAfter' => 80]);
-        $word->getDocInfo()->setTitle($dossier->getTitle())->setCreator('Judilibre Agent');
+        $word->getDocInfo()->setTitle($dossier->getTitle())->setCreator('Cassius');
 
         $section = $word->addSection(['marginTop' => 1200, 'marginBottom' => 1200, 'marginLeft' => 1300, 'marginRight' => 1300]);
         $section->addFooter()->addText($this->renderer->footer(), ['size' => 8, 'italic' => true, 'color' => '64748B'], ['alignment' => Jc::CENTER]);
