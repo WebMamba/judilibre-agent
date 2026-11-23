@@ -15,7 +15,6 @@ use Symfony\AI\Platform\Result\Stream\Delta\ToolCallComplete;
 use Symfony\AI\Platform\Result\ToolCall;
 use Symfony\Bundle\FrameworkBundle\KernelBrowser;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
-use Symfony\Component\Lock\LockFactory;
 
 /**
  * End to end: the controller, the AG-UI bundle and bridge, the real agent and its tools,
@@ -160,35 +159,6 @@ final class AgentStreamTest extends WebTestCase
         $this->post(['threadId' => $this->thread, 'runId' => 'r', 'messages' => [['id' => 'u1', 'role' => 'user', 'content' => 'Bonjour']]]);
 
         self::assertResponseStatusCodeSame(403);
-    }
-
-    public function testOneRunAtATimePerDossier(): void
-    {
-        $lock = self::getContainer()->get(LockFactory::class)->createLock('dossier-'.$this->thread);
-        $lock->acquire();
-
-        try {
-            $this->post(['threadId' => $this->thread, 'runId' => 'r', 'messages' => [['id' => 'u1', 'role' => 'user', 'content' => 'Bonjour']]]);
-            self::assertResponseStatusCodeSame(409);
-        } finally {
-            $lock->release();
-        }
-    }
-
-    /** A run that died or hangs without releasing its lock: the dossier is freed once its TTL is over. */
-    public function testTheLockOfAnAbandonedRunExpires(): void
-    {
-        $abandoned = self::getContainer()->get(LockFactory::class)->createLock('dossier-'.$this->thread, 1.0, autoRelease: false);
-        self::assertTrue($abandoned->acquire());
-
-        $this->post(['threadId' => $this->thread, 'runId' => 'r', 'messages' => [['id' => 'u1', 'role' => 'user', 'content' => 'Bonjour']]]);
-        self::assertResponseStatusCodeSame(409);
-
-        sleep(2);
-        ScriptedPlatform::$rounds = [[new TextDelta('Bonjour.')]];
-        $events = $this->stream();
-
-        self::assertSame('RUN_FINISHED', end($events)['type']);
     }
 
     public function testAStateThatIsNotOneIsRejected(): void

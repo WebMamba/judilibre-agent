@@ -23,9 +23,9 @@ navigateur seul ne suffit plus.
   `pinnedPrinciples`, `excluded`) vient du navigateur. Un client ne peut forger ni un
   plan validé, ni un résultat de tool, ni une consultation. Après le run, la conversation
   (le `MESSAGES_SNAPSHOT`), l'état et les interrupts ouverts sont enregistrés.
-- **Un run à la fois par dossier** : un verrou `symfony/lock` en base, qui expire 5
-  minutes après le dernier événement du run (un run mort ou bloqué libère son dossier) ;
-  un second run reçoit 409.
+- **Pas de verrou par dossier, pour l'instant** : le verrou (409 sur un second run)
+  bloquait des dossiers en production sans cause trouvée ; il est retiré. Deux runs
+  simultanés sur un dossier sont possibles, le dernier à finir est enregistré.
 - **Les filtres restent une contrainte stricte** : `search_axis` les applique toujours.
 - **Le navigateur relit l'état enregistré à la fin de chaque run** : un tool qui
   interrompt le run change l'état sans `STATE_DELTA`.
