@@ -71,8 +71,7 @@ Symfony, essential
 
 Case law, sorted, understood, ready to plead, and the long-standing components for
 reliability: **Doctrine** to save every dossier, **Security** so each lawyer only sees
-their own, **Lock** so a dossier is only processed by one run at a time, **Validator** and
-**Serializer** so the dossier state always stays consistent.
+their own, **Validator** and **Serializer** so the dossier state always stays consistent.
 
 Requirements
 ------------

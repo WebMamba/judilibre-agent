@@ -21,7 +21,6 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\ConflictHttpException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
-use Symfony\Component\Lock\LockFactory;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Http\Attribute\IsCsrfTokenValid;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
@@ -38,7 +37,6 @@ final class DossierController extends AbstractController
 {
     public function __construct(
         private readonly DossierRepository $dossiers,
-        private readonly LockFactory $locks,
         private readonly NormalizerInterface $normalizer,
         private readonly DenormalizerInterface $denormalizer,
     ) {
@@ -153,21 +151,12 @@ final class DossierController extends AbstractController
     /** @param callable(ResearchState): void $change */
     private function change(Dossier $dossier, callable $change): JsonResponse
     {
-        $lock = $this->locks->createLock('dossier-'.$dossier->getId(), 30.0);
-        if (!$lock->acquire()) {
-            throw new ConflictHttpException('A run is already in progress on this dossier.');
-        }
+        $state = $this->denormalizer->denormalize($dossier->getState(), ResearchState::class);
+        \assert($state instanceof ResearchState);
+        $change($state);
+        $dossier->recordState((array) $this->normalizer->normalize($state));
+        $this->dossiers->save($dossier);
 
-        try {
-            $state = $this->denormalizer->denormalize($dossier->getState(), ResearchState::class);
-            \assert($state instanceof ResearchState);
-            $change($state);
-            $dossier->recordState((array) $this->normalizer->normalize($state));
-            $this->dossiers->save($dossier);
-
-            return new JsonResponse(['state' => $dossier->getState()]);
-        } finally {
-            $lock->release();
-        }
+        return new JsonResponse(['state' => $dossier->getState()]);
     }
 }

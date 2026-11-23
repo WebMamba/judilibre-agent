@@ -16,9 +16,7 @@ use Symfony\AI\Agent\AgentInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
-use Symfony\Component\HttpKernel\Exception\ConflictHttpException;
 use Symfony\Component\HttpKernel\Exception\UnprocessableEntityHttpException;
-use Symfony\Component\Lock\LockFactory;
 use Symfony\Component\Routing\Attribute\Route;
 
 /**
@@ -38,7 +36,6 @@ final class StreamController extends AbstractController
         ResearchState $state,
         DossierRepository $dossiers,
         DossierRuns $runs,
-        LockFactory $locks,
     ): AgUiResponse {
         $owner = $this->getUser()?->getUserIdentifier() ?? throw new AccessDeniedHttpException();
         if (1 !== preg_match('/^'.Dossier::ID_PATTERN.'$/', $input->threadId)) {
@@ -50,11 +47,6 @@ final class StreamController extends AbstractController
             throw new AccessDeniedHttpException('This dossier is not yours.');
         }
 
-        $lock = $locks->createLock('dossier-'.$dossier->getId(), DossierRuns::LOCK_TTL);
-        if (!$lock->acquire()) {
-            throw new ConflictHttpException('A run is already in progress on this dossier.');
-        }
-
         // A run streams for minutes: release the session lock first, or the Live
         // Components of the page would wait for the run to end.
         if ($request->hasSession() && $request->getSession()->isStarted()) {
@@ -64,15 +56,9 @@ final class StreamController extends AbstractController
         try {
             $events = $agUi->run($runs->prepare($dossier, $input), $researcher, state: $state);
         } catch (InvalidStateException $e) {
-            $lock->release();
-
             throw new UnprocessableEntityHttpException($e->getMessage(), $e);
-        } catch (\Throwable $e) {
-            $lock->release();
-
-            throw $e;
         }
 
-        return new AgUiResponse($runs->record($dossier, $events, $state, $lock));
+        return new AgUiResponse($runs->record($dossier, $events, $state));
     }
 }
